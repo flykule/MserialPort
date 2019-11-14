@@ -8,6 +8,8 @@ add_library( # Sets the name of the library.
         SHARED
         SerialPort.cpp
         PFBackgroundService.cpp
+        SerialPortManager.cpp
+        SPBackgroundService.cpp
         native-lib.cpp)
 
 find_library( # Sets the name of the path variable.
