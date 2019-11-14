@@ -4,9 +4,7 @@
 
 #include "includes/SerialPortManager.h"
 
-SerialPortManager::SerialPortManager() {
-
-}
+SerialPortManager::SerialPortManager() = default;
 
 SerialPortManager::~SerialPortManager() {
     closeAll();
@@ -30,14 +28,14 @@ int SerialPortManager::removeSerialPort(std::string &path) {
 int SerialPortManager::sendMessage(std::string &path, std::string &msg) {
     auto search = _map.find(path);
     if (search == _map.end()) {
-        return -1;
+        addSerialPort(path,msg);
     }
     _map[path]->processMsg(msg);
     return 0;
 }
 
 void SerialPortManager::closeAll() {
-    _map.clear()
+    _map.clear();
 }
 
 
