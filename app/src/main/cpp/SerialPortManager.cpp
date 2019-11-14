@@ -4,7 +4,7 @@
 
 #include "includes/SerialPortManager.h"
 
-SerialPortManager::SerialPortManager() : _map(std::unordered_map()) {
+SerialPortManager::SerialPortManager() {
 
 }
 
@@ -13,13 +13,31 @@ SerialPortManager::~SerialPortManager() {
 }
 
 int SerialPortManager::addSerialPort(std::string &path, BaudRate baudRate) {
-    auto search = _map.find(path);
-    if (search == _map.end()) {
-//        std::unique_ptr<IBackgroundService> pfService = std::make_unique<PFBackgroundService>(
-//                [](std::string msg) {
-//                    LOGD("Received message %s", msg.c_str());
-//                });
-//        _map.insert(path,)
-    }
+    _map[path] = std::make_unique<SPBackgroundService>(path, baudRate);
     return 0;
 }
+
+int SerialPortManager::removeSerialPort(std::string &path) {
+    auto search = _map.find(path);
+    if (search == _map.end()) {
+        return -1;
+    }
+    _map.erase(search);
+    return 0;
+
+}
+
+int SerialPortManager::sendMessage(std::string &path, std::string &msg) {
+    auto search = _map.find(path);
+    if (search == _map.end()) {
+        return -1;
+    }
+    _map[path]->processMsg(msg);
+    return 0;
+}
+
+void SerialPortManager::closeAll() {
+    _map.clear()
+}
+
+

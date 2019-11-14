@@ -5,11 +5,8 @@
 #ifndef MSERIALPORT_SERIALPORTMANAGER_H
 #define MSERIALPORT_SERIALPORTMANAGER_H
 
-#include <SerialPort.hpp>
-#include "SerialPort.hpp"
 #include <unordered_map>
-#include <string>
-#include <PFBackgroundService.h>
+#include <SPBackgroundService.h>
 
 using namespace mn::CppLinuxSerial;
 
@@ -21,12 +18,12 @@ public:
 
     int addSerialPort(std::string& path, BaudRate baudRate);
 
-    void removeSerialPort(std::string& path);
+    int removeSerialPort(std::string& path);
 
-    int sendMessage(std::string& path, const std::string& msg);
+    int sendMessage(std::string& path, std::string &msg);
 
 private:
-    std::unordered_map<std::string, std::unique_ptr<IBackgroundService>> _map;
+    std::unordered_map<std::string, std::unique_ptr<SPBackgroundService>> _map;
 
     void closeAll();
 

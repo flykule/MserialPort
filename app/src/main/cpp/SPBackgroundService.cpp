@@ -5,14 +5,15 @@
 #include "includes/SPBackgroundService.h"
 
 SPBackgroundService::SPBackgroundService(std::string &name, BaudRate baudRate) :
-        _serialPort(SerialPort(name, baudRate)),
-        _service(std::make_unique<PFBackgroundService>([](std::string msg) {
-            _serialPort.Write(msg);
-        })) { _serialPort.Open(); }
+        _serialPort(SerialPort(name, baudRate)) {
+    _service = std::make_unique<PFBackgroundService>([this](std::string msg) {
+        _serialPort.Write(msg);
+    });
+    _serialPort.Open();
+}
 
 SPBackgroundService::~SPBackgroundService() {
-    delete (_service);
-    _service = nullptr;
+    _service.reset(nullptr);
     _serialPort.Close();
 }
 
