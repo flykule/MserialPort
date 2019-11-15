@@ -14,7 +14,7 @@
 #include <string.h>    // String function definitions
 #include <unistd.h>    // UNIX standard function definitions
 #include <fcntl.h>    // File control definitions
-#include <errno.h>    // Error number definitions
+#include <cerrno>    // Error number definitions
 #include <termios.h>    // POSIX terminal control definitions (struct termios)
 #include <system_error>    // For throwing std::system_error
 
@@ -28,16 +28,16 @@ namespace mn {
         SerialPort::SerialPort() {
             echo_ = false;
             timeout_ms_ = defaultTimeout_ms_;
-            baudRate_ = defaultBaudRate_;
+            custom_baudRate = 9600;
             readBufferSize_B_ = defaultReadBufferSize_B_;
             readBuffer_.reserve(readBufferSize_B_);
         }
 
-        SerialPort::SerialPort(const std::string &device, BaudRate baudRate) :
+        SerialPort::SerialPort(const std::string &device, int baudRate) :
                 SerialPort() {
             state_ = State::CLOSED;
             device_ = device;
-            baudRate_ = baudRate;
+            custom_baudRate = baudRate;
         }
 
         SerialPort::~SerialPort() {
@@ -57,8 +57,8 @@ namespace mn {
                 ConfigureTermios();
         }
 
-        void SerialPort::SetBaudRate(BaudRate baudRate) {
-            baudRate_ = baudRate;
+        void SerialPort::SetBaudRate(int baudRate) {
+            custom_baudRate = baudRate;
             if (state_ == State::OPEN)
                 ConfigureTermios();
         }
@@ -121,33 +121,9 @@ namespace mn {
                            CLOCAL;                    // Turn on READ & ignore ctrl lines (CLOCAL = 1)
 
 
-            //===================== BAUD RATE =================//
-
-            switch (baudRate_) {
-                case BaudRate::B_9600:
-                    cfsetispeed(&tty, B9600);
-                    cfsetospeed(&tty, B9600);
-                    break;
-                case BaudRate::B_38400:
-                    cfsetispeed(&tty, B38400);
-                    cfsetospeed(&tty, B38400);
-                    break;
-                case BaudRate::B_57600:
-                    cfsetispeed(&tty, B57600);
-                    cfsetospeed(&tty, B57600);
-                    break;
-                case BaudRate::B_115200:
-                    cfsetispeed(&tty, B115200);
-                    cfsetospeed(&tty, B115200);
-                    break;
-                case BaudRate::CUSTOM:
-                    // See https://gist.github.com/kennethryerson/f7d1abcf2633b7c03cf0
-                    throw std::runtime_error("Custom baud rate not yet supported.");
-                default:
-                    throw std::runtime_error(
-                            std::string() + "baudRate passed to " + __PRETTY_FUNCTION__ +
-                            " unrecognized.");
-            }
+            //===================== (Baudrate) =================//
+            cfsetispeed(&tty, getBaudrate(custom_baudRate));
+            cfsetospeed(&tty, getBaudrate(custom_baudRate));
 
             //===================== (.c_oflag) =================//
 
@@ -341,7 +317,7 @@ namespace mn {
             return fileDesc_;
         }
 
-        void SerialPort::Write(char *bytes,  int len) {
+        void SerialPort::Write(char *bytes, int len) {
 
             if (state_ != State::OPEN)
                 THROW_EXCEPT(std::string() + __PRETTY_FUNCTION__ +

@@ -4,7 +4,7 @@
 
 #include "includes/SPBackgroundService.h"
 
-SPBackgroundService::SPBackgroundService(std::string &name, BaudRate baudRate) :
+SPBackgroundService::SPBackgroundService(std::string &name, int baudRate) :
         _serialPort(SerialPort(name, baudRate)) {
     _service = std::make_unique<PFBackgroundService>([this](std::string msg) {
         _serialPort.Write(msg);

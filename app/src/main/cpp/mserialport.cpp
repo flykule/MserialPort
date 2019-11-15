@@ -1,10 +1,6 @@
 #include <jni.h>
 #include <android/log.h>
-#include <string>
-#include <vector>
-#include <Exception.hpp>
-#include <SerialPort.hpp>
-#include <PFBackgroundService.h>
+#include <SerialPortManager.h>
 
 using namespace mn::CppLinuxSerial;
 
@@ -15,6 +11,7 @@ static const char *TAG = "serial_port";
 
 const int BIT16 = 16;
 const int BIT8 = 8;
+const SerialPortManager mManager;
 
 void HexToBytes(const std::string &hex, char *result) {
     for (unsigned int i = 0; i < hex.length(); i += 2) {
@@ -37,31 +34,16 @@ void sendTestData(SerialPort &serialPort, std::string &data) {
     }
 }
 
-std::unique_ptr<IBackgroundService> pfService = std::make_unique<PFBackgroundService>(
-        [](std::string msg) {
-            LOGD("Received message %s", msg.c_str());
-        });
-
 extern "C" JNIEXPORT void JNICALL
-Java_com_example_mserialport_MainActivity_testSendData(
+Java_com_castle_serialport_SerialPortManager_openSerialPort(
         JNIEnv *env,
         jobject thiz,
-        jstring data) {
-//    LOGD("开始开启串口并测试发送数据");
-    SerialPort serialPort;
-    serialPort = SerialPort("/dev/ttysWK0", BaudRate::B_9600);
-    serialPort.Open();
-    if (serialPort.currendState() != State::OPEN) {
-        LOGE("Open serial port failed");
-    } else {
-        LOGD("Open serial port success!");
-    }
-    const char *path_utf = env->GetStringUTFChars(data, nullptr);
-    std::string s = std::string(path_utf);
-    LOGD("发送命令 %s", path_utf);
-    sendTestData(serialPort, s);
-    env->ReleaseStringUTFChars(data, path_utf);
-    //make an instance of the promise/future implementation
-    pfService->processMessage(s);
+        jstring path,
+        jint baudRate
+) {
+    const char *path_utf = env->GetStringUTFChars(path, nullptr);
+    mManager.addSerialPort(std::string(path_utf),);
+    env->ReleaseStringUTFChars(path, path_utf);
+
 }
 

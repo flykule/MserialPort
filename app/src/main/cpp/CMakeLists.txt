@@ -4,13 +4,13 @@ cmake_minimum_required(VERSION 3.4.1)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/includes)
 
 add_library( # Sets the name of the library.
-        native-lib
+        mserialport
         SHARED
         SerialPort.cpp
         PFBackgroundService.cpp
         SerialPortManager.cpp
         SPBackgroundService.cpp
-        native-lib.cpp)
+        mserialport.cpp)
 
 find_library( # Sets the name of the path variable.
         log-lib
@@ -24,7 +24,7 @@ find_library( # Sets the name of the path variable.
 # build script, prebuilt third-party libraries, or system libraries.
 
 target_link_libraries( # Specifies the target library.
-        native-lib
+        mserialport
 #        JNI
         # Links the target library to the log library
         # included in the NDK.

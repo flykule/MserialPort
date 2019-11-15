@@ -16,7 +16,7 @@ public:
 
     virtual ~SerialPortManager();
 
-    int addSerialPort(std::string& path, BaudRate baudRate);
+    int addSerialPort(std::string& path, int baudRate);
 
     int removeSerialPort(std::string& path);
 

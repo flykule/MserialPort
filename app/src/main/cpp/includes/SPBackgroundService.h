@@ -14,7 +14,7 @@ using namespace mn::CppLinuxSerial;
 class SPBackgroundService {
 public:
     SPBackgroundService( std::string &name,
-                        BaudRate baudRate);
+                        int baudRate);
 
     virtual ~SPBackgroundService();
 
