@@ -6,5 +6,5 @@
 * 底层直接管理串口, 添加删除等
 * 目前的线程通讯通过std::future进行, 未来考虑支持socket通信
 ## 效果展示
-![demo](https://github.com/flykule/MserialPort/blob/master/gif/demo.mp4)
+![demo](https://github.com/flykule/MserialPort/blob/master/gif/demo.gif)
 
