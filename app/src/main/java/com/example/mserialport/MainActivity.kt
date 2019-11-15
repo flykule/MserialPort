@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.castle.serialport.SerialPortManager
 import kotlinx.android.synthetic.main.activity_main.*
 import java.util.*
+import kotlin.concurrent.fixedRateTimer
 
 class MainActivity : AppCompatActivity() {
 
@@ -56,7 +57,7 @@ class MainActivity : AppCompatActivity() {
         update_version.setOnClickListener {
             val millis = System.currentTimeMillis()
             val version = Random(millis).nextInt(2000)
-//            testSendData(pageCmd("2900", "v:${version}${version}"))
+            mSerialPortManager.sendMessage(mScreenPath, pageCmd("2900", "${version}${version}"));
         }
         // Example of a call to a native method
 //        sample_text.text = stringFromJNI()
@@ -64,6 +65,19 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        val thread = Thread(Runnable {
+            fixedRateTimer(
+                "timer", false,
+                5 * 1000, 1
+            ) {
+                val millis = System.currentTimeMillis()
+                val version = Random(millis).nextInt(2000)
+                mSerialPortManager.sendMessage(
+                    mScreenPath,
+                    pageCmd("2900", "v:${version}${version}")
+                )
+            }
+        }).start()
     }
 
     /**
