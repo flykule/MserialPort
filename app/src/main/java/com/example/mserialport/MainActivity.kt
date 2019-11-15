@@ -2,14 +2,25 @@ package com.example.mserialport
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.castle.serialport.SerialPortManager
 import kotlinx.android.synthetic.main.activity_main.*
 import java.util.*
-import kotlin.concurrent.fixedRateTimer
 
 class MainActivity : AppCompatActivity() {
 
     fun pageJump(jumper: PageJump): String {
         return "5aa5078200845a0100${jumper.pageIndex}"
+    }
+
+    private val mScreenPath = "/dev/ttysWK0"
+
+    val mSerialPortManager by lazy {
+        SerialPortManager().apply {
+            openSerialPort(
+                mScreenPath,
+                9600
+            )
+        }
     }
 
     val PAGE_STATUS_INITING = "01" //初始化界面
@@ -39,14 +50,13 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         update_time.setOnClickListener {
-            val command = dateCommand
-            testSendData(command)
+            mSerialPortManager.sendMessage(mScreenPath, dateCommand)
         }
 
         update_version.setOnClickListener {
             val millis = System.currentTimeMillis()
             val version = Random(millis).nextInt(2000)
-            testSendData(pageCmd("2900", "v:${version}${version}"))
+//            testSendData(pageCmd("2900", "v:${version}${version}"))
         }
         // Example of a call to a native method
 //        sample_text.text = stringFromJNI()
@@ -54,18 +64,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        val thread = Thread(Runnable {
-            fixedRateTimer(
-                "timer", false,
-                5 * 1000, 1
-            ) {
-                val command = dateCommand
-                testSendData(command)
-                val millis = System.currentTimeMillis()
-                val version = Random(millis).nextInt(2000)
-                testSendData(pageCmd("2900", "v:${version}${version}"))
-            }
-        }).start()
     }
 
     /**

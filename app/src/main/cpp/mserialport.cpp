@@ -9,29 +9,34 @@ static const char *TAG = "serial_port";
 #define LOGD(fmt, args...) __android_log_print(ANDROID_LOG_DEBUG, TAG, fmt, ##args)
 #define LOGE(fmt, args...) __android_log_print(ANDROID_LOG_ERROR, TAG, fmt, ##args)
 
-const int BIT16 = 16;
-const int BIT8 = 8;
-const SerialPortManager mManager;
+SerialPortManager mManager;
 
-void HexToBytes(const std::string &hex, char *result) {
-    for (unsigned int i = 0; i < hex.length(); i += 2) {
-        std::string byteString = hex.substr(i, 2);
-        char byte = (char) strtol(byteString.c_str(), nullptr, BIT16);
-        *result = byte;
-        result++;
-    }
+extern "C" JNIEXPORT void JNICALL
+Java_com_castle_serialport_SerialPortManager_sendMessage(
+        JNIEnv *env,
+        jobject thiz,
+        jstring path,
+        jstring msg
+) {
+    const char *path_utf = env->GetStringUTFChars(path, nullptr);
+    const char *msg_utf = env->GetStringUTFChars(msg, nullptr);
+    auto message = std::string(msg_utf);
+    auto name = std::string(path_utf);
+    mManager.sendMessage(name, message);
+    env->ReleaseStringUTFChars(path, path_utf);
+    env->ReleaseStringUTFChars(msg, msg_utf);
 }
 
-void sendTestData(SerialPort &serialPort, std::string &data) {
-    //将string转换为hexBytes
-    char command[data.size() / 2];
-    HexToBytes(data, command);
-    serialPort.Write(command, data.size() / 2);
-    serialPort.Close();
-
-    if (serialPort.currendState() == State::CLOSED) {
-        LOGD("关闭串口成功");
-    }
+extern "C" JNIEXPORT void JNICALL
+Java_com_castle_serialport_SerialPortManager_closeSerialPort(
+        JNIEnv *env,
+        jobject thiz,
+        jstring path
+) {
+    const char *path_utf = env->GetStringUTFChars(path, nullptr);
+    auto name = std::string(path_utf);
+    mManager.removeSerialPort(name);
+    env->ReleaseStringUTFChars(path, path_utf);
 }
 
 extern "C" JNIEXPORT void JNICALL
@@ -42,8 +47,8 @@ Java_com_castle_serialport_SerialPortManager_openSerialPort(
         jint baudRate
 ) {
     const char *path_utf = env->GetStringUTFChars(path, nullptr);
-    mManager.addSerialPort(std::string(path_utf),);
+    auto name = std::string(path_utf);
+    mManager.addSerialPort(name, (int) baudRate);
     env->ReleaseStringUTFChars(path, path_utf);
-
 }
 

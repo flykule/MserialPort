@@ -4,9 +4,8 @@
 
 #include "includes/SerialPortManager.h"
 
-SerialPortManager::SerialPortManager() {
 
-}
+SerialPortManager::SerialPortManager() = default;
 
 SerialPortManager::~SerialPortManager() {
     closeAll();
