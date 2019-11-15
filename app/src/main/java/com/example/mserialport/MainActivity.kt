@@ -14,12 +14,18 @@ class MainActivity : AppCompatActivity() {
     }
 
     private val mScreenPath = "/dev/ttysWK0"
+    val SERIAL_PORT_NAME_KEYBROAD = "/dev/ttysWK2"//键盘对应的串口名
+    val SERIAL_PORT_KEYBROAD = 9600//键盘串口的波特率
 
     val mSerialPortManager by lazy {
-        SerialPortManager().apply {
+        SerialPortManager.apply {
             openSerialPort(
                 mScreenPath,
                 9600
+            )
+            openSerialPort(
+                SERIAL_PORT_NAME_KEYBROAD,
+                SERIAL_PORT_KEYBROAD
             )
         }
     }
@@ -68,14 +74,10 @@ class MainActivity : AppCompatActivity() {
         val thread = Thread(Runnable {
             fixedRateTimer(
                 "timer", false,
-                5 * 1000, 1
+                5 * 1000, 10
             ) {
-                val millis = System.currentTimeMillis()
-                val version = Random(millis).nextInt(2000)
-                mSerialPortManager.sendMessage(
-                    mScreenPath,
-                    pageCmd("2900", "v:${version}${version}")
-                )
+                val testRead = mSerialPortManager.testRead(SERIAL_PORT_NAME_KEYBROAD)
+                println("读取到键盘信息${HexUtils.bytesToHexString(testRead)}")
             }
         }).start()
     }

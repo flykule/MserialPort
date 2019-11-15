@@ -1,6 +1,6 @@
 package com.castle.serialport
 
-class SerialPortManager {
+object SerialPortManager {
     init {
         System.loadLibrary("mserialport")
     }
@@ -27,5 +27,11 @@ class SerialPortManager {
      * @return 如果失败,底层会直接抛出异常
      */
     external fun sendMessage(path: String, msg: String)
+
+    /**
+     * 从指定串口读一次消息,阻塞
+     * @param path 串口路径,通常为/dev/tty*开头
+     */
+    external fun testRead(path: String): ByteArray
 
 }

@@ -24,6 +24,7 @@ class SPBackgroundService {
 public:
     SPBackgroundService( std::string &name,
                         int baudRate);
+    SPBackgroundService(std::string &name, int baudRate,const std::function<void(std::string)>& reactor);
 
     virtual ~SPBackgroundService();
 
