@@ -17,7 +17,7 @@ public:
     virtual ~SerialPortManager();
 
     int addSerialPort(std::string &path, int baudRate);
-    SerialPort& getSerialPort(std::string &path);
+    SerialPort& getSerialPort(std::string path);
 
     int addSerialPort(const std::function<void(std::string)> &reactor, std::string &path, int baudRate);
 

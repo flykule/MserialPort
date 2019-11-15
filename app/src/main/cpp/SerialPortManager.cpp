@@ -46,7 +46,7 @@ void SerialPortManager::closeAll() {
     _map.clear();
 }
 
-SerialPort& SerialPortManager::getSerialPort(std::string &path) {
+SerialPort& SerialPortManager::getSerialPort(std::string path) {
     return _map[path]->getSerialPort();
 }
 

@@ -57,9 +57,9 @@ static JavaVM *g_vm;
 
 struct ReadStruct {
     jobject jcallback;
-    std::string &name;
+    std::string name;
 
-    void operator()(std::string &msg) const {
+    void operator()(std::string msg) const {
         JNIEnv *jenv;
         if (msg == PFBackgroundService::DESTROY) {
             //释放当前线程
@@ -104,7 +104,7 @@ struct ReadStruct {
             }
         }
     }
-};
+} mReadFun;
 
 extern "C" JNIEXPORT void JNICALL
 Java_com_castle_serialport_SerialPortManager_testRead(
@@ -114,15 +114,14 @@ Java_com_castle_serialport_SerialPortManager_testRead(
         jint baudRate,
         jobject callback
 ) {
-    struct ReadStruct readFun;
     const char *path_utf = env->GetStringUTFChars(path, nullptr);
     auto name = std::string(path_utf);
-    readFun.name = name;
+    mReadFun.name = name;
     env->GetJavaVM(&g_vm);
-    readFun.jcallback = env->NewGlobalRef(callback);
+    mReadFun.jcallback = env->NewGlobalRef(callback);
 
     std::string start = "start";
-    mManager.addSerialPort(readFun, name, (int) baudRate);
+    mManager.addSerialPort(mReadFun, name, (int) baudRate);
     mManager.sendMessage(name, start);
     env->ReleaseStringUTFChars(path, path_utf);
 }
