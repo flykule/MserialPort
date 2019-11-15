@@ -31,8 +31,7 @@ void SPBackgroundService::processMsg(const std::string &msg) {
 SPBackgroundService::SPBackgroundService(std::string &name, int baudRate,
                                          const std::function<void(std::string)> &reactor)
         : _serialPort(SerialPort(name, baudRate)),
-        _service(std::make_unique<PFBackgroundService>((reactor)))
-        { }
+          _service(std::make_unique<PFBackgroundService>((reactor))) { _serialPort.Open(); }
 
 SerialPort &SPBackgroundService::getSerialPort() {
     return _serialPort;

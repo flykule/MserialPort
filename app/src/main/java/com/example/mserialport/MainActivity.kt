@@ -64,8 +64,8 @@ class MainActivity : AppCompatActivity() {
             SERIAL_PORT_NAME_KEYBROAD,
             9600,
             object : SerialPortManager.OnReadListener {
-                override fun onDataReceived(msg: String) {
-                    println("接受到键盘消息$msg")
+                override fun onDataReceived(msg: ByteArray) {
+                    println("接受到键盘消息${HexUtils.bytesToHexString(msg)}")
                 }
             });
         // Example of a call to a native method

@@ -74,9 +74,9 @@ struct ReadStruct {
             if (getEnvStat == JNI_EDETACHED) {
                 //如果没有， 主动附加到jvm环境中，获取到env
                 if (g_vm->AttachCurrentThread(&jenv, nullptr) != 0) {
+                    mManager.sendMessage(name, PFBackgroundService::DESTROY);
                     return;
                 }
-                mManager.sendMessage(name, PFBackgroundService::DESTROY);
             }
 
             //通过强转后的jcallback 获取到要回调的类
@@ -90,7 +90,7 @@ struct ReadStruct {
 
             //获取要回调的方法ID
             jmethodID javaCallbackId = jenv->GetMethodID(javaClass,
-                                                         "onDataReceived", "(Ljava/lang/String;)V");
+                                                         "onDataReceived", "([B)V");
             if (javaCallbackId == nullptr) {
                 LOGE("Unable to find method:onProgressCallBack");
                 mManager.sendMessage(name, PFBackgroundService::DESTROY);
@@ -100,7 +100,7 @@ struct ReadStruct {
             while (true) {
                 mManager.getSerialPort(name).Read(data);
                 //执行回调
-                jenv->CallIntMethod(jcallback, javaCallbackId, data);
+                jenv->CallVoidMethod(jcallback, javaCallbackId, StringToJByteArray(jenv, data));
             }
         }
     }

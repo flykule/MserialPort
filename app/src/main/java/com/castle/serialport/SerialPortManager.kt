@@ -35,6 +35,6 @@ object SerialPortManager {
     external fun testRead(path: String, baudrate: Int, listener: OnReadListener)
 
     interface OnReadListener {
-        fun onDataReceived(msg: String)
+        fun onDataReceived(msg: ByteArray)
     }
 }
