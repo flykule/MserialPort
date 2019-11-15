@@ -1,6 +1,7 @@
 #include <PFBackgroundService.h>
 
 const std::string PFBackgroundService::STOP = "stop";
+const std::string PFBackgroundService::DESTROY= "destroy";
 
 PFBackgroundService::PFBackgroundService(const std::function<void(std::string)>& reactor)
 {
@@ -18,6 +19,10 @@ PFBackgroundService::PFBackgroundService(const std::function<void(std::string)>&
                         break;
                     }
                     reactor(msg);
+                    if (msg == PFBackgroundService::DESTROY)
+                    {
+                        break;
+                    }
                 }
             }            
         }, reactor);

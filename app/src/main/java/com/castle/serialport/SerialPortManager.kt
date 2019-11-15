@@ -32,6 +32,9 @@ object SerialPortManager {
      * 从指定串口读一次消息,阻塞
      * @param path 串口路径,通常为/dev/tty*开头
      */
-    external fun testRead(path: String): ByteArray
+    external fun testRead(path: String, baudrate: Int, listener: OnReadListener)
 
+    interface OnReadListener {
+        fun onDataReceived(msg: String)
+    }
 }

@@ -16,6 +16,13 @@ int SerialPortManager::addSerialPort(std::string &path, int baudRate) {
     return 0;
 }
 
+int
+SerialPortManager::addSerialPort(const std::function<void(std::string)> &reactor, std::string &path,
+                                 int baudRate) {
+    _map[path] = std::make_unique<SPBackgroundService>(path, baudRate, reactor);
+    return 0;
+}
+
 int SerialPortManager::removeSerialPort(std::string &path) {
     auto search = _map.find(path);
     if (search == _map.end()) {
@@ -26,7 +33,7 @@ int SerialPortManager::removeSerialPort(std::string &path) {
 
 }
 
-int SerialPortManager::sendMessage(std::string &path, std::string &msg) {
+int SerialPortManager::sendMessage(const std::string &path, const std::string &msg) {
     auto search = _map.find(path);
     if (search == _map.end()) {
         return -1;
@@ -37,6 +44,10 @@ int SerialPortManager::sendMessage(std::string &path, std::string &msg) {
 
 void SerialPortManager::closeAll() {
     _map.clear();
+}
+
+SerialPort& SerialPortManager::getSerialPort(std::string &path) {
+    return _map[path]->getSerialPort();
 }
 
 

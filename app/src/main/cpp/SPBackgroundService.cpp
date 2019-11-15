@@ -22,7 +22,7 @@ SPBackgroundService::~SPBackgroundService() {
     _serialPort.Close();
 }
 
-void SPBackgroundService::processMsg(std::string &msg) {
+void SPBackgroundService::processMsg(const std::string &msg) {
     if (_serialPort.currendState() == State::OPEN && _service != nullptr) {
         _service->processMessage(msg);
     }
@@ -33,4 +33,8 @@ SPBackgroundService::SPBackgroundService(std::string &name, int baudRate,
         : _serialPort(SerialPort(name, baudRate)),
         _service(std::make_unique<PFBackgroundService>((reactor)))
         { }
+
+SerialPort &SPBackgroundService::getSerialPort() {
+    return _serialPort;
+}
 

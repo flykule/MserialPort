@@ -16,11 +16,14 @@ public:
 
     virtual ~SerialPortManager();
 
-    int addSerialPort(std::string& path, int baudRate);
+    int addSerialPort(std::string &path, int baudRate);
+    SerialPort& getSerialPort(std::string &path);
 
-    int removeSerialPort(std::string& path);
+    int addSerialPort(const std::function<void(std::string)> &reactor, std::string &path, int baudRate);
 
-    int sendMessage(std::string& path, std::string &msg);
+    int removeSerialPort(std::string &path);
+
+    int sendMessage(const std::string &path, const std::string &msg);
 
 private:
     std::unordered_map<std::string, std::unique_ptr<SPBackgroundService>> _map;

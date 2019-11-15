@@ -28,7 +28,9 @@ public:
 
     virtual ~SPBackgroundService();
 
-    void processMsg(std::string& msg);
+    void processMsg(const std::string& msg);
+
+    SerialPort& getSerialPort();
 
 private:
     SerialPort _serialPort;

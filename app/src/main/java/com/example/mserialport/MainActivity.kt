@@ -5,7 +5,6 @@ import androidx.appcompat.app.AppCompatActivity
 import com.castle.serialport.SerialPortManager
 import kotlinx.android.synthetic.main.activity_main.*
 import java.util.*
-import kotlin.concurrent.fixedRateTimer
 
 class MainActivity : AppCompatActivity() {
 
@@ -22,10 +21,6 @@ class MainActivity : AppCompatActivity() {
             openSerialPort(
                 mScreenPath,
                 9600
-            )
-            openSerialPort(
-                SERIAL_PORT_NAME_KEYBROAD,
-                SERIAL_PORT_KEYBROAD
             )
         }
     }
@@ -65,21 +60,29 @@ class MainActivity : AppCompatActivity() {
             val version = Random(millis).nextInt(2000)
             mSerialPortManager.sendMessage(mScreenPath, pageCmd("2900", "${version}${version}"));
         }
+        mSerialPortManager.testRead(
+            SERIAL_PORT_NAME_KEYBROAD,
+            9600,
+            object : SerialPortManager.OnReadListener {
+                override fun onDataReceived(msg: String) {
+                    println("接受到键盘消息$msg")
+                }
+            });
         // Example of a call to a native method
 //        sample_text.text = stringFromJNI()
     }
 
     override fun onResume() {
         super.onResume()
-        val thread = Thread(Runnable {
-            fixedRateTimer(
-                "timer", false,
-                5 * 1000, 10
-            ) {
-                val testRead = mSerialPortManager.testRead(SERIAL_PORT_NAME_KEYBROAD)
-                println("读取到键盘信息${HexUtils.bytesToHexString(testRead)}")
-            }
-        }).start()
+//        val thread = Thread(Runnable {
+//            fixedRateTimer(
+//                "timer", false,
+//                5 * 1000, 10
+//            ) {
+//                val testRead = mSerialPortManager.testRead(SERIAL_PORT_NAME_KEYBROAD)
+//                println("读取到键盘信息${HexUtils.bytesToHexString(testRead)}")
+//            }
+//        }).start()
     }
 
     /**

@@ -72,10 +72,12 @@ private:
     //instance of promise/future pair that is used for messaging
     PromiseAndFuture<std::string> m_PF;
 
-    //stop message
-    const static std::string STOP;
 
 public:
+    //stop message
+    const static std::string STOP;
+    //destroy message
+    const static std::string DESTROY;
     //constructor (takes in fptr to a "reactor" function that "reacts"
     //to a string message)
     PFBackgroundService(const std::function<void(std::string)>& reactor);
