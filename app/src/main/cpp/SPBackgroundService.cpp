@@ -7,9 +7,10 @@
 SPBackgroundService::SPBackgroundService(std::string &name, int baudRate) :
         _serialPort(SerialPort(name, baudRate)) {
     _service = std::make_unique<PFBackgroundService>([this](std::string msg) {
-        char temp[msg.size() / 2];
+        int len = msg.length() / 2;
+        char temp[len];
         HexToBytes(msg, temp);
-        _serialPort.Write(temp);
+        _serialPort.Write(temp, len);
     });
     _serialPort.Open();
 }
