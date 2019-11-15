@@ -3,10 +3,12 @@
 //
 
 #include "includes/SPBackgroundService.h"
+#include <androidLog.h>
 
 SPBackgroundService::SPBackgroundService(std::string &name, int baudRate) :
         _serialPort(SerialPort(name, baudRate)) {
     _service = std::make_unique<PFBackgroundService>([this](std::string msg) {
+        LOGD("执行发送消息%s", msg.c_str());
         int len = msg.length() / 2;
         char temp[len];
         HexToBytes(msg, temp);
