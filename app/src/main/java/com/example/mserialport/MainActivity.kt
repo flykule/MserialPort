@@ -74,25 +74,12 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-//        val thread = Thread(Runnable {
-//            fixedRateTimer(
-//                "timer", false,
-//                5 * 1000, 10
-//            ) {
-//                val testRead = mSerialPortManager.testRead(SERIAL_PORT_NAME_KEYBROAD)
-//                println("读取到键盘信息${HexUtils.bytesToHexString(testRead)}")
-//            }
-//        }).start()
     }
 
     /**
      * A native method that is implemented by the 'native-lib' native library,
      * which is packaged with this application.
      */
-//    external fun stringFromJNI(): String
-
-//    external fun testSendData(data: String)
-
     fun enUnicode(str: String): String {// 将汉字转换为16进制数
 
         var st = ""

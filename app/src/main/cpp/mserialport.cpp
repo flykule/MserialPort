@@ -114,14 +114,15 @@ Java_com_castle_serialport_SerialPortManager_testRead(
         jint baudRate,
         jobject callback
 ) {
+    ReadStruct mStruct;
     const char *path_utf = env->GetStringUTFChars(path, nullptr);
     auto name = std::string(path_utf);
-    mReadFun.name = name;
+    mStruct.name = name;
     env->GetJavaVM(&g_vm);
-    mReadFun.jcallback = env->NewGlobalRef(callback);
+    mStruct.jcallback = env->NewGlobalRef(callback);
 
     std::string start = "start";
-    mManager.addSerialPort(mReadFun, name, (int) baudRate);
+    mManager.addSerialPort(mStruct, name, (int) baudRate);
     mManager.sendMessage(name, start);
     env->ReleaseStringUTFChars(path, path_utf);
 }
