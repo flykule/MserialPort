@@ -79,6 +79,8 @@ namespace mn {
 
             SerialPort(const std::string &device, int baudRate);
 
+            SerialPort(const SerialPort& serialPort);
+
             //! @brief		Destructor. Closes serial port if still open.
             virtual ~SerialPort();
 

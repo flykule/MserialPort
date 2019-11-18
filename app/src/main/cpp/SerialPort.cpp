@@ -8,6 +8,7 @@
 //!					See README.rst in repo root dir for more info.
 
 // System includes
+#include <androidLog.h>
 #include <iostream>
 #include <sstream>
 #include <stdio.h>    // Standard input/output definitions
@@ -336,5 +337,8 @@ namespace mn {
             }
         }
 
+        SerialPort::SerialPort(const SerialPort &serialPort) {
+            LOGD("开始复制,原是否开启");
+        }
     } // namespace CppLinuxSerial
 } // namespace mn

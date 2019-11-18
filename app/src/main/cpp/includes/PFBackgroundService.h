@@ -7,6 +7,7 @@
 #include <chrono>
 #include <iostream>
 #include <IWorker.h>
+#include <androidLog.h>
 
 class PFBackgroundService : public IBackgroundService {
 private:
@@ -72,22 +73,23 @@ public:
     static constexpr auto STOP = "stop";
 
     template<typename W>
-    PFBackgroundService(W &worker) {
+    PFBackgroundService(W *worker) {
         m_thread = std::make_unique<std::thread>(
-                [&](W &worker1) {
+                [&](W w) {
                     std::string msg;
                     while (true) {
                         if (m_PF.ready()) {
                             msg = m_PF.get();
                             if (msg == PFBackgroundService::STOP) {
-                                worker1.stop();
+                                w.stop();
                                 break;
                             }
-                            worker1.doWork(msg);
+                            w.doWork(msg);
                         }
                     }
-                }, worker);
+                },*worker);
     }
+
     //interface method
     void processMessage(std::string msg);
 

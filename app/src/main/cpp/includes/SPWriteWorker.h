@@ -18,7 +18,7 @@ public:
     void doWork(std::string &msg);
     virtual ~SPWriteWorker();
 private:
-    SerialPort _serialPort;
+    SerialPort* _serialPort;
 };
 
 

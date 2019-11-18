@@ -27,7 +27,7 @@ void SPReadWorker::doWork(std::string &msg) {
 
     //获取要回调的方法ID
     jmethodID javaCallbackId = env->GetMethodID(javaClass,
-                                                 "onDataReceived", "([B)V");
+                                                "onDataReceived", "([B)V");
     if (javaCallbackId == nullptr) {
         std::__throw_runtime_error("获取java回调方法失败!");
     }
@@ -41,6 +41,8 @@ void SPReadWorker::doWork(std::string &msg) {
 }
 
 SPReadWorker::~SPReadWorker() {
+//    _serialPort.Close();
+//    _serialPort = nullptr;
     g_vm->DetachCurrentThread();
     g_vm = nullptr;
     //释放你的全局引用的接口，生命周期自己把控

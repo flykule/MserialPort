@@ -9,6 +9,7 @@
 #include <SPWriteWorker.h>
 #include <SPReadWorker.h>
 #include <PFBackgroundService.h>
+#include <androidLog.h>
 
 class SerialPortManager {
 public:
@@ -16,15 +17,15 @@ public:
 
     virtual ~SerialPortManager();
 
-//    template <typename T>
-//    int addSerialPort(std::string path, int flag, T& worker);
     template <typename T>
-    int addSerialPort(std::string path, int flag, T& worker) {
+    int addSerialPort(std::string path, int flag, T* worker) {
         if (flag & FLAG_READ) {
             read_map[path] = std::make_unique<PFBackgroundService>(worker);
+            LOGD("添加读串口%s",path.c_str());
         }
         if (flag & FLAG_WRITE) {
             write_map[path] = std::make_unique<PFBackgroundService>(worker);
+            LOGD("添加写串口%s",path.c_str());
         }
         return 0;
     }
@@ -38,7 +39,6 @@ public:
 private:
     std::unordered_map<std::string, std::unique_ptr<PFBackgroundService>> read_map;
     std::unordered_map<std::string, std::unique_ptr<PFBackgroundService>> write_map;
-
 
 };
 

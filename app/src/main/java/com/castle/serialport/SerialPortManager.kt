@@ -1,5 +1,7 @@
 package com.castle.serialport
 
+import android.util.Log
+
 
 object SerialPortManager {
     //写flag
@@ -7,6 +9,7 @@ object SerialPortManager {
     //读flag
     const val FLAG_READ = 2;
     init {
+        Log.d("SerialPortManager", "开始加载库")
         System.loadLibrary("mserialport")
     }
 
