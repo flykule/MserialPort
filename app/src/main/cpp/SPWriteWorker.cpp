@@ -23,19 +23,9 @@ SPWriteWorker::SPWriteWorker(const char *c_name, const int *baudrate) :
 }
 
 SPWriteWorker::~SPWriteWorker() {
-//    if (_serialPort) {
-//        _serialPort->Close();
-//        _serialPort == nullptr;
-//    }
-    LOGD("worker关闭串口成功");
 };
 
 void SPWriteWorker::doWork(std::string &msg) {
-    LOGD("开始写数据%s", msg.c_str());
-    if(_serialPort->currendState()!=mn::CppLinuxSerial::State::OPEN){
-        LOGE("串口关闭状态,直接返回");
-        return;
-    }
     int len = msg.length() / 2;
     char temp[len];
     HexToBytes(msg, temp);
