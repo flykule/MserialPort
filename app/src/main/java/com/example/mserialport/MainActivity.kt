@@ -60,16 +60,20 @@ class MainActivity : AppCompatActivity() {
             val version = Random(millis).nextInt(2000)
             mSerialPortManager.sendMessage(mScreenPath, pageCmd("2900", "${version}${version}"));
         }
-        mSerialPortManager.testRead(
-            SERIAL_PORT_NAME_KEYBROAD,
-            9600,
-            object : SerialPortManager.OnReadListener {
-                override fun onDataReceived(msg: ByteArray) {
-                    println("接受到键盘消息${HexUtils.bytesToHexString(msg)}")
-                }
-            });
+        start_listen_kb.setOnClickListener {
+            mSerialPortManager.testRead(
+                SERIAL_PORT_NAME_KEYBROAD,
+                9600,
+                object : SerialPortManager.OnReadListener {
+                    override fun onDataReceived(msg: ByteArray) {
+                        println("接受到键盘消息${HexUtils.bytesToHexString(msg)}")
+                    }
+                });
+        }
+        end_listen_kb.setOnClickListener {
+            mSerialPortManager.closeSerialPort(SERIAL_PORT_NAME_KEYBROAD);
+        }
         // Example of a call to a native method
-//        sample_text.text = stringFromJNI()
     }
 
     override fun onResume() {

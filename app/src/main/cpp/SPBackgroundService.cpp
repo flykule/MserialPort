@@ -18,6 +18,7 @@ SPBackgroundService::SPBackgroundService(std::string &name, int baudRate) :
 }
 
 SPBackgroundService::~SPBackgroundService() {
+    LOGD("开始清除串口");
     _service.reset(nullptr);
     _serialPort.Close();
 }

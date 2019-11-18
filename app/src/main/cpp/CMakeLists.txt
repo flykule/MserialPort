@@ -10,6 +10,8 @@ add_library( # Sets the name of the library.
         PFBackgroundService.cpp
         SerialPortManager.cpp
         SPBackgroundService.cpp
+        SPWriteWorker.cpp
+        SPReadWorker.cpp
         mserialport.cpp)
 
 find_library( # Sets the name of the path variable.

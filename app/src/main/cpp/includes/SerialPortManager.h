@@ -6,9 +6,8 @@
 #define MSERIALPORT_SERIALPORTMANAGER_H
 
 #include <unordered_map>
-#include <SPBackgroundService.h>
-
-using namespace mn::CppLinuxSerial;
+#include <IWorker.h>
+#include <PFBackgroundService.h>
 
 class SerialPortManager {
 public:
@@ -16,19 +15,18 @@ public:
 
     virtual ~SerialPortManager();
 
-    int addSerialPort(std::string &path, int baudRate);
-    SerialPort& getSerialPort(std::string path);
+    int addSerialPort(std::string &path, int flag, IWorker worker);
 
-    int addSerialPort(const std::function<void(std::string)> &reactor, std::string &path, int baudRate);
+    int removeSerialPort(std::string &path, int flag);
 
-    int removeSerialPort(std::string &path);
+    int sendMessage(const std::string &path, const std::string &msg, int flag);
 
-    int sendMessage(const std::string &path, const std::string &msg);
-
+    static const int FLAG_READ = 1;
+    static const int FLAG_WRITE = 2;
 private:
-    std::unordered_map<std::string, std::unique_ptr<SPBackgroundService>> _map;
+    std::unordered_map<std::string, std::unique_ptr<PFBackgroundService>> read_map;
+    std::unordered_map<std::string, std::unique_ptr<PFBackgroundService>> write_map;
 
-    void closeAll();
 
 };
 

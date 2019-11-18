@@ -1,12 +1,13 @@
 #include <PFBackgroundService.h>
 
 const std::string PFBackgroundService::STOP = "stop";
-const std::string PFBackgroundService::DESTROY= "destroy";
+//const std::string PFBackgroundService::DESTROY= "destroy";
 
-PFBackgroundService::PFBackgroundService(const std::function<void(std::string)>& reactor)
+template<typename ...typs>
+PFBackgroundService::PFBackgroundService(const IWorker& worker, typs...args)
 {
     m_thread = std::make_unique<std::thread>(
-        [&](std::function<void(std::string)> reactor)
+        [&](IWorker& worker1)
         {
             std::string msg;
             while (true)
@@ -16,16 +17,17 @@ PFBackgroundService::PFBackgroundService(const std::function<void(std::string)>&
                     msg = m_PF.get();
                     if (msg == PFBackgroundService::STOP)
                     {
+                        worker1.interrupt();
                         break;
                     }
-                    reactor(msg);
-                    if (msg == PFBackgroundService::DESTROY)
-                    {
-                        break;
-                    }
+                    worker1.doWork(msg,args);
+//                    if (msg == PFBackgroundService::DESTROY)
+//                    {
+//                        break;
+//                    }
                 }
             }            
-        }, reactor);
+        }, worker);
 }
 
 void PFBackgroundService::processMessage(std::string msg)

@@ -4,50 +4,48 @@
 
 #include "includes/SerialPortManager.h"
 
-
 SerialPortManager::SerialPortManager() = default;
 
+int SerialPortManager::addSerialPort(std::string &path, int flag, IWorker worker) {
+    if (flag & FLAG_READ) {
+        read_map[path] == std::make_unique<PFBackgroundService>(path, worker);
+    }
+    if (flag & FLAG_WRITE) {
+        write_map[path] == std::make_unique<PFBackgroundService>(path, worker);
+    }
+    return 0;
+}
+
+int SerialPortManager::removeSerialPort(std::string &path, int flag) {
+    if (flag & FLAG_READ) {
+        read_map[path]->processMessage(PFBackgroundService::STOP);
+        read_map.erase(path);
+    }
+    if (flag & FLAG_WRITE) {
+        write_map[path]->processMessage(PFBackgroundService::STOP);
+        write_map.erase(path);
+    }
+    return 0;
+
+}
+
+int SerialPortManager::sendMessage(const std::string &path, const std::string &msg, int flag) {
+    if (flag & FLAG_READ) {
+        read_map[path]->processMessage(path);
+    }
+    if (flag & FLAG_WRITE) {
+        write_map[path]->processMessage(path);
+    }
+    return 0;
+}
+
 SerialPortManager::~SerialPortManager() {
-    closeAll();
-}
-
-int SerialPortManager::addSerialPort(std::string &path, int baudRate) {
-    _map[path] = std::make_unique<SPBackgroundService>(path, baudRate);
-    return 0;
-}
-
-int
-SerialPortManager::addSerialPort(const std::function<void(std::string)> &reactor, std::string &path,
-                                 int baudRate) {
-    _map[path] = std::make_unique<SPBackgroundService>(path, baudRate, reactor);
-    return 0;
-}
-
-int SerialPortManager::removeSerialPort(std::string &path) {
-    auto search = _map.find(path);
-    if (search == _map.end()) {
-        return -1;
+    for (auto r:read_map) {
+        removeSerialPort(r.first, FLAG_READ);
     }
-    _map.erase(search);
-    return 0;
-
-}
-
-int SerialPortManager::sendMessage(const std::string &path, const std::string &msg) {
-    auto search = _map.find(path);
-    if (search == _map.end()) {
-        return -1;
+    for (auto r:write_map) {
+        removeSerialPort(r.first, FLAG_WRITE);
     }
-    _map[path]->processMsg(msg);
-    return 0;
-}
-
-void SerialPortManager::closeAll() {
-    _map.clear();
-}
-
-SerialPort& SerialPortManager::getSerialPort(std::string path) {
-    return _map[path]->getSerialPort();
 }
 
 
