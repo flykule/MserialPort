@@ -31,7 +31,6 @@ Java_com_castle_serialport_SerialPortManager_closeSerialPort(
 ) {
 //    const char *path_utf = env->GetStringUTFChars(path, nullptr);
 //    auto name = std::string(path_utf);
-//    mManager.sendMessage(name, PFBackgroundService::DESTROY);
 //    mManager.removeSerialPort(name);
 //    env->ReleaseStringUTFChars(path, path_utf);
 }
@@ -55,6 +54,7 @@ Java_com_castle_serialport_SerialPortManager_openSerialPort(
 
 
 static JavaVM *g_vm;
+static constexpr auto start = "start";
 
 extern "C" JNIEXPORT void JNICALL
 Java_com_castle_serialport_SerialPortManager_testRead(
@@ -64,13 +64,12 @@ Java_com_castle_serialport_SerialPortManager_testRead(
         jint baudRate,
         jobject callback
 ) {
-//    const char *path_utf = env->GetStringUTFChars(path, nullptr);
-//    auto name = std::string(path_utf);
-//    env->GetJavaVM(&g_vm);
-//    ReadStruct mStruct(env->NewGlobalRef(callback), name);
-//
-//    std::string start = "start";
-//    mManager.addSerialPort(mStruct, name, (int) baudRate);
-//    mManager.sendMessage(name, start);
-//    env->ReleaseStringUTFChars(path, path_utf);
+    const char *path_utf = env->GetStringUTFChars(path, nullptr);
+    auto name = std::string(path_utf);
+    env->GetJavaVM(&g_vm);
+
+    auto p = new SPReadWorker(name.c_str(),&baudRate,g_vm,&callback);
+    mManager.addSerialPort(name, (int) baudRate,p);
+    mManager.sendMessage(name, start,SerialPortManager::FLAG_READ);
+    env->ReleaseStringUTFChars(path, path_utf);
 }

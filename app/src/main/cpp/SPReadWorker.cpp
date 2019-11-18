@@ -34,27 +34,31 @@ void SPReadWorker::doWork(std::string &msg) {
     std::string data;
 
     while (!isInterrupted()) {
-        _serialPort.Read(data);
+        _serialPort->Read(data);
         //执行回调
         env->CallVoidMethod(*jcallback, javaCallbackId, StringToJByteArray(env, data));
     }
 }
 
-SPReadWorker::~SPReadWorker() {
-//    _serialPort.Close();
-//    _serialPort = nullptr;
+void SPReadWorker::stop() {
+    _serialPort->Close();
+    _serialPort = nullptr;
     g_vm->DetachCurrentThread();
     g_vm = nullptr;
-    //释放你的全局引用的接口，生命周期自己把控
+//    释放你的全局引用的接口，生命周期自己把控
     env->DeleteGlobalRef(*jcallback);
     jcallback = nullptr;
     env = nullptr;
+    IWorker::stop();
 }
+
+//会被复制,在这里不做事了
+SPReadWorker::~SPReadWorker() = default;
 
 SPReadWorker::SPReadWorker(const char *c_name, const int *baudrate, JavaVM *vm, jobject *cal) :
         g_vm(vm),
         jcallback(cal),
         env(nullptr) {
-    _serialPort = SerialPort(c_name, *baudrate);
-    _serialPort.Open();
+    _serialPort = new SerialPort(c_name, *baudrate);
+    _serialPort->Open();
 }
