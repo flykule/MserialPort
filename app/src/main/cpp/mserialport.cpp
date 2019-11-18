@@ -45,9 +45,10 @@ Java_com_castle_serialport_SerialPortManager_openSerialPort(
         jint flags
 ) {
     const char *path_utf = env->GetStringUTFChars(path, nullptr);
-    auto name = std::string(path_utf);
+    std::string name = std::string(path_utf);
     if (flags & SerialPortManager::FLAG_WRITE) {
-        mManager.addSerialPort(name, (int) flags, SPWriteWorker(name.c_str(), &baudRate));
+        SPWriteWorker worker = SPWriteWorker(name.c_str(),&baudRate);
+        mManager.addSerialPort(name, (int) flags,worker);
     }
     env->ReleaseStringUTFChars(path, path_utf);
 }

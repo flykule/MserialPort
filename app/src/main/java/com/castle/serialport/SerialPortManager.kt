@@ -1,6 +1,11 @@
 package com.castle.serialport
 
+
 object SerialPortManager {
+    //写flag
+    const val FLAG_WRITE = 1;
+    //读flag
+    const val FLAG_READ = 2;
     init {
         System.loadLibrary("mserialport")
     }

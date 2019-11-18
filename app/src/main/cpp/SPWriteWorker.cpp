@@ -15,7 +15,7 @@ static void HexToBytes(const std::string &hex, char *result) {
     }
 }
 
-SPWriteWorker::SPWriteWorker(const char *c_name, const int *baudrate) :
+SPWriteWorker::SPWriteWorker(const char *c_name, const int *baudrate):
         _serialPort(SerialPort(c_name, *baudrate)) {
     _serialPort.Open();
 }

@@ -10,7 +10,7 @@ static jbyteArray StringToJByteArray(JNIEnv *env, const std::string &nativeStrin
     return arr;
 }
 
-void SPReadWorker::doWork(std::string &msg, JNIEnv *jniEnv, JavaVM *g_vm, jobject callback) {
+void SPReadWorker::doWork(std::string &msg) {
     int getEnvStat = g_vm->GetEnv(reinterpret_cast<void **>(&env), JNI_VERSION_1_6);
     if (getEnvStat == JNI_EDETACHED) {
         //如果没有， 主动附加到jvm环境中，获取到env

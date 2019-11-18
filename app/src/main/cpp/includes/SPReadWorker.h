@@ -5,7 +5,6 @@
 #ifndef MSERIALPORT_SPREADWORKER_H
 #define MSERIALPORT_SPREADWORKER_H
 
-#include <jni.h>
 #include <SerialPort.hpp>
 #include "IWorker.h"
 #include <PFBackgroundService.h>
@@ -15,10 +14,8 @@ class SPReadWorker : IWorker {
 public:
 
     SPReadWorker(const char *c_name,const int* baudrate, JavaVM *vm, jobject *cal);
-
     virtual ~SPReadWorker();
-
-    void doWork(std::string &msg, JNIEnv *jniEnv, JavaVM *g_vm, jobject callback);
+    void doWork(std::string &msg);
 
 private:
     JavaVM *g_vm;

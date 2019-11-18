@@ -10,15 +10,13 @@
 #include <PFBackgroundService.h>
 
 using namespace mn::CppLinuxSerial;
+
 class SPWriteWorker : IWorker {
 public:
-
+    using SPWriteWorker::IWorker::stop;
     SPWriteWorker(const char *c_name,const int* baudrate);
-
-    virtual ~SPWriteWorker();
-
     void doWork(std::string &msg);
-
+    virtual ~SPWriteWorker();
 private:
     SerialPort _serialPort;
 };

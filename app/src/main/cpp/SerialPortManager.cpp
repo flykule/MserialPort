@@ -6,17 +6,18 @@
 
 SerialPortManager::SerialPortManager() = default;
 
-int SerialPortManager::addSerialPort(std::string &path, int flag, IWorker worker) {
-    if (flag & FLAG_READ) {
-        read_map[path] == std::make_unique<PFBackgroundService>(path, worker);
-    }
-    if (flag & FLAG_WRITE) {
-        write_map[path] == std::make_unique<PFBackgroundService>(path, worker);
-    }
-    return 0;
-}
+//template <typename T>
+//int SerialPortManager::addSerialPort(std::string path, int flag, T& worker) {
+//    if (flag & FLAG_READ) {
+//        read_map[path] = std::make_unique<PFBackgroundService>(worker);
+//    }
+//    if (flag & FLAG_WRITE) {
+//        write_map[path] = std::make_unique<PFBackgroundService>(worker);
+//    }
+//    return 0;
+//}
 
-int SerialPortManager::removeSerialPort(std::string &path, int flag) {
+int SerialPortManager::removeSerialPort(std::string path, int flag) {
     if (flag & FLAG_READ) {
         read_map[path]->processMessage(PFBackgroundService::STOP);
         read_map.erase(path);
@@ -29,7 +30,7 @@ int SerialPortManager::removeSerialPort(std::string &path, int flag) {
 
 }
 
-int SerialPortManager::sendMessage(const std::string &path, const std::string &msg, int flag) {
+int SerialPortManager::sendMessage(std::string path, const std::string &msg, int flag) {
     if (flag & FLAG_READ) {
         read_map[path]->processMessage(path);
     }
@@ -40,10 +41,10 @@ int SerialPortManager::sendMessage(const std::string &path, const std::string &m
 }
 
 SerialPortManager::~SerialPortManager() {
-    for (auto r:read_map) {
+    for (auto& r:read_map) {
         removeSerialPort(r.first, FLAG_READ);
     }
-    for (auto r:write_map) {
+    for (auto& r:write_map) {
         removeSerialPort(r.first, FLAG_WRITE);
     }
 }

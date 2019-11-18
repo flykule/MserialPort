@@ -9,7 +9,6 @@ add_library( # Sets the name of the library.
         SerialPort.cpp
         PFBackgroundService.cpp
         SerialPortManager.cpp
-        SPBackgroundService.cpp
         SPWriteWorker.cpp
         SPReadWorker.cpp
         mserialport.cpp)

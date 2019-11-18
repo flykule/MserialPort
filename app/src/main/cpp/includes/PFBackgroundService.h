@@ -11,8 +11,6 @@
 class PFBackgroundService : public IBackgroundService {
 private:
 
-    IWorker _worker;
-
     //thread-safe wrapper class for a promise/future pair
     template<typename T>
     struct PromiseAndFuture {
@@ -71,15 +69,25 @@ private:
 
 public:
     //stop message
-    const static std::string STOP;
-    //destroy message
-//    const static std::string DESTROY;
+    static constexpr auto STOP = "stop";
 
-    //constructor (takes in fptr to a "reactor" function that "reacts"
-    //to a string message)
-    template<typename ...typs>
-    PFBackgroundService(const IWorker &worker, typs...args);
-
+    template<typename W>
+    PFBackgroundService(W &worker) {
+        m_thread = std::make_unique<std::thread>(
+                [&](W &worker1) {
+                    std::string msg;
+                    while (true) {
+                        if (m_PF.ready()) {
+                            msg = m_PF.get();
+                            if (msg == PFBackgroundService::STOP) {
+                                worker1.stop();
+                                break;
+                            }
+                            worker1.doWork(msg);
+                        }
+                    }
+                }, worker);
+    }
     //interface method
     void processMessage(std::string msg);
 

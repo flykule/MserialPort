@@ -21,6 +21,7 @@ class MainActivity : AppCompatActivity() {
             openSerialPort(
                 mScreenPath,
                 9600
+                , FLAG_WRITE
             )
         }
     }
@@ -52,13 +53,13 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         update_time.setOnClickListener {
-            mSerialPortManager.sendMessage(mScreenPath, dateCommand)
+            mSerialPortManager.sendMessage(mScreenPath, dateCommand, SerialPortManager.FLAG_WRITE)
         }
 
         update_version.setOnClickListener {
             val millis = System.currentTimeMillis()
             val version = Random(millis).nextInt(2000)
-            mSerialPortManager.sendMessage(mScreenPath, pageCmd("2900", "${version}${version}"));
+            mSerialPortManager.sendMessage(mScreenPath, pageCmd("2900", "${version}${version}"), 2);
         }
         start_listen_kb.setOnClickListener {
             mSerialPortManager.testRead(

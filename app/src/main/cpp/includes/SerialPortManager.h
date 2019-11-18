@@ -6,7 +6,8 @@
 #define MSERIALPORT_SERIALPORTMANAGER_H
 
 #include <unordered_map>
-#include <IWorker.h>
+#include <SPWriteWorker.h>
+#include <SPReadWorker.h>
 #include <PFBackgroundService.h>
 
 class SerialPortManager {
@@ -15,14 +16,25 @@ public:
 
     virtual ~SerialPortManager();
 
-    int addSerialPort(std::string &path, int flag, IWorker worker);
+//    template <typename T>
+//    int addSerialPort(std::string path, int flag, T& worker);
+    template <typename T>
+    int addSerialPort(std::string path, int flag, T& worker) {
+        if (flag & FLAG_READ) {
+            read_map[path] = std::make_unique<PFBackgroundService>(worker);
+        }
+        if (flag & FLAG_WRITE) {
+            write_map[path] = std::make_unique<PFBackgroundService>(worker);
+        }
+        return 0;
+    }
 
-    int removeSerialPort(std::string &path, int flag);
+    int removeSerialPort(std::string path, int flag);
 
-    int sendMessage(const std::string &path, const std::string &msg, int flag);
+    int sendMessage(std::string path, const std::string &msg, int flag);
 
-    static const int FLAG_READ = 1;
-    static const int FLAG_WRITE = 2;
+    static constexpr unsigned int FLAG_WRITE{0x1}; // hex for 0000 0001
+    static constexpr unsigned int FLAG_READ{0x2}; // hex for 0000 0010
 private:
     std::unordered_map<std::string, std::unique_ptr<PFBackgroundService>> read_map;
     std::unordered_map<std::string, std::unique_ptr<PFBackgroundService>> write_map;

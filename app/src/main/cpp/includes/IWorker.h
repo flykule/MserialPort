@@ -5,21 +5,23 @@
 #ifndef MSERIALPORT_IWORKER_H
 #define MSERIALPORT_IWORKER_H
 
+#include <jni.h>
 #include <string>
 
 class IWorker {
 
 public:
-    template<typename ...types>
-    virtual void doWork(std::string &msg, types...args) = 0;
+    IWorker() {}
+
+    virtual void doWork(std::string &msg) = 0;
 
     virtual ~IWorker() {}
 
-    void interrupt() {
+    void stop() {
         interrupted = -1;
     }
 
-    int isInterrupted(){
+    int isInterrupted() {
         return interrupted;
     }
 

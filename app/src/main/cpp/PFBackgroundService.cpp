@@ -1,51 +1,42 @@
 #include <PFBackgroundService.h>
 
-const std::string PFBackgroundService::STOP = "stop";
 //const std::string PFBackgroundService::DESTROY= "destroy";
 
-template<typename ...typs>
-PFBackgroundService::PFBackgroundService(const IWorker& worker, typs...args)
-{
-    m_thread = std::make_unique<std::thread>(
-        [&](IWorker& worker1)
-        {
-            std::string msg;
-            while (true)
-            {
-                if (m_PF.ready())
-                {
-                    msg = m_PF.get();
-                    if (msg == PFBackgroundService::STOP)
-                    {
-                        worker1.interrupt();
-                        break;
-                    }
-                    worker1.doWork(msg,args);
-//                    if (msg == PFBackgroundService::DESTROY)
-//                    {
-//                        break;
+//template<typename W>
+//PFBackgroundService::PFBackgroundService(W &worker) {
+//    m_thread = std::make_unique<std::thread>(
+//            [&](W &worker1) {
+//                std::string msg;
+//                while (true) {
+//                    if (m_PF.ready()) {
+//                        msg = m_PF.get();
+//                        if (msg == PFBackgroundService::STOP) {
+//                            worker1.interrupt();
+//                            break;
+//                        }
+//                        worker1.doWork(msg);
 //                    }
-                }
-            }            
-        }, worker);
-}
+//                }
+//            }, worker);
+//}
 
-void PFBackgroundService::processMessage(std::string msg)
-{
+void PFBackgroundService::processMessage(std::string msg) {
     bool success = false;
-    while (!success)
-    {
+    while (!success) {
         success = m_PF.set(msg);
     }
 }
 
-PFBackgroundService::~PFBackgroundService()
-{
-    processMessage(PFBackgroundService::STOP);
-    if (m_thread->joinable())
-    {
-        m_thread->join();
+PFBackgroundService::~PFBackgroundService() {
+    try {
+        processMessage(PFBackgroundService::STOP);
+        if (m_thread->joinable()) {
+            m_thread->join();
+        }
+    } catch (...) {
+        //todo add some log here, but nothing to do now
     }
+
 }
 
 
