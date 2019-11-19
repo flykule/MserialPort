@@ -74,11 +74,14 @@ class MainActivity : AppCompatActivity() {
                     }
                 })
         }
-        start_listen_kb_2.setOnClickListener {
+        start_listen_screen_2.setOnClickListener {
             mSerialPortManager.openWriteSerialPort(
                 SEARIAL_PORT_NAME_SCREEN_2,
                 SERIAL_PORT_KEYBROAD
             )
+        }
+        end_listen_screen_2.setOnClickListener {
+            mSerialPortManager.closeSerialPort(SEARIAL_PORT_NAME_SCREEN_2)
         }
         close_all_sp.setOnClickListener {
             mSerialPortManager.closeSerialPort(mScreenPath)

@@ -71,13 +71,13 @@
         app:layout_constraintTop_toBottomOf="@id/update_version" />
 
     <Button
-        android:id="@+id/start_listen_kb_2"
+        android:id="@+id/start_listen_screen_2"
         android:background="@color/colorPrimary"
         android:foreground="?android:selectableItemBackground"
         android:textColor="#fff"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="开启键盘2"
+        android:text="开启副屏"
         app:layout_constraintLeft_toRightOf="@id/update_version"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="@id/update_version" />
@@ -93,6 +93,17 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@id/start_listen_kb" />
+    <Button
+        android:id="@+id/end_listen_screen_2"
+        android:background="@color/colorPrimary"
+        android:foreground="?android:selectableItemBackground"
+        android:textColor="#fff"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="关闭副屏"
+        app:layout_constraintLeft_toRightOf="@id/start_listen_kb"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="@id/start_listen_kb" />
     <Button
         android:id="@+id/close_all_sp"
         android:background="@color/colorPrimary"
