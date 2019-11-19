@@ -52,9 +52,9 @@ Java_com_castle_serialport_SerialPortManager_openSerialPort(
     env->ReleaseStringUTFChars(path, path_utf);
 }
 
-
 static JavaVM *g_vm;
-static jobject g_callback;
+//用于储存读回调
+static std::unordered_map<std::string, jobject> g_callback_map;
 static constexpr auto start = "start";
 
 jint JNI_OnLoad(JavaVM *jvm, void *reserved) {
@@ -78,8 +78,8 @@ Java_com_castle_serialport_SerialPortManager_testRead(
 ) {
     const char *path_utf = env->GetStringUTFChars(path, nullptr);
     auto name = std::string(path_utf);
-    g_callback = env->NewGlobalRef(callback);
-    auto p = new SPReadWorker(name.c_str(), &baudRate, g_vm, &g_callback);
+    g_callback_map[name] = env->NewGlobalRef(callback);
+    auto p = new SPReadWorker(name.c_str(), &baudRate, g_vm, &g_callback_map[name]);
     mManager.addSerialPort(name, SerialPortManager::FLAG_READ, p);
     mManager.sendMessage(name, start, SerialPortManager::FLAG_READ);
     env->ReleaseStringUTFChars(path, path_utf);
