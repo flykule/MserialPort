@@ -11,6 +11,49 @@ static jbyteArray StringToJByteArray(JNIEnv *env, const std::string &nativeStrin
 }
 
 void SPReadWorker::doWork(std::string &msg) {
+//    auto t = std::thread(&SPReadWorker::readLoop, this);
+//    work_thread = &t;
+}
+
+void SPReadWorker::stop() {
+    LOGD("收到了停止消息");
+    _serialPort->Close();
+    _serialPort = nullptr;
+    if (g_vm)
+        g_vm->DetachCurrentThread();
+    g_vm = nullptr;
+//    释放你的全局引用的接口，生命周期自己把控
+    if (jcallback)
+        env->DeleteGlobalRef(*jcallback);
+    jcallback = nullptr;
+    env = nullptr;
+    IWorker::stop();
+    if (work_thread.joinable()) {
+        work_thread.join();
+    }
+//    work_thread = nullptr;
+}
+
+
+//会被复制,在这里不做事了
+SPReadWorker::~SPReadWorker() {
+    LOGD("开始销毁SPReadWorker");
+};
+
+SPReadWorker::SPReadWorker(const char *c_name, const int *baudrate, JavaVM *vm,
+                           jobject *callback) :
+        jcallback(callback),
+//        work_thread(nullptr),
+        g_vm(vm),
+        env(nullptr) {
+    _serialPort = new SerialPort(c_name, *baudrate);
+    //non-blocking read
+    _serialPort->SetTimeout(0);
+    _serialPort->Open();
+}
+
+void SPReadWorker::readLoop() {
+    LOGD("到此正常");
     int getEnvStat = g_vm->GetEnv(reinterpret_cast<void **>(&env), JNI_VERSION_1_6);
     if (getEnvStat == JNI_EDETACHED) {
         //如果没有， 主动附加到jvm环境中，获取到env
@@ -31,37 +74,19 @@ void SPReadWorker::doWork(std::string &msg) {
     if (javaCallbackId == nullptr) {
         std::__throw_runtime_error("获取java回调方法失败!");
     }
-    std::string data;
 
+    std::string data;
+//    LOGD("开始读取数据", data.c_str());
     while (!isInterrupted()) {
         _serialPort->Read(data);
-        //执行回调
-        env->CallVoidMethod(*jcallback, javaCallbackId, StringToJByteArray(env, data));
+        if (!data.empty()) {
+            //执行回调
+            if (*jcallback == nullptr) {
+                LOGD("因为获取不到回调而停止");
+                stop();
+            }
+            LOGD("读取到数据%s", data.c_str());
+            env->CallVoidMethod(*jcallback, javaCallbackId, StringToJByteArray(env, data));
+        }
     }
-}
-
-void SPReadWorker::stop() {
-    _serialPort->Close();
-    _serialPort = nullptr;
-    g_vm->DetachCurrentThread();
-    g_vm = nullptr;
-//    释放你的全局引用的接口，生命周期自己把控
-    _method_id = nullptr;
-    env->DeleteGlobalRef(*jcallback);
-    jcallback = nullptr;
-    env = nullptr;
-    IWorker::stop();
-}
-
-
-//会被复制,在这里不做事了
-SPReadWorker::~SPReadWorker() = default;
-
-SPReadWorker::SPReadWorker(const char *c_name, const int *baudrate, JavaVM *vm,
-                           jobject *callback) :
-        jcallback(callback),
-        g_vm(vm),
-        env(nullptr) {
-    _serialPort = new SerialPort(c_name, *baudrate);
-    _serialPort->Open();
 }

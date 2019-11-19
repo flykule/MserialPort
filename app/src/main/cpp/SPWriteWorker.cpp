@@ -23,6 +23,7 @@ SPWriteWorker::SPWriteWorker(const char *c_name, const int *baudrate) :
 }
 
 SPWriteWorker::~SPWriteWorker() {
+    LOGD("Write worker get destroyed");
 };
 
 void SPWriteWorker::doWork(std::string &msg) {

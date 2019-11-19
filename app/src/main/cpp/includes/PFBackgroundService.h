@@ -75,19 +75,19 @@ public:
     template<typename W>
     PFBackgroundService(W *worker) {
         m_thread = std::make_unique<std::thread>(
-                [&](W w) {
+                [this, worker]() {
                     std::string msg;
                     while (true) {
                         if (m_PF.ready()) {
                             msg = m_PF.get();
                             if (msg == PFBackgroundService::STOP) {
-                                w.stop();
+                                worker->stop();
                                 break;
                             }
-                            w.doWork(msg);
+                            worker->doWork(msg);
                         }
                     }
-                },*worker);
+                });
     }
 
     //interface method

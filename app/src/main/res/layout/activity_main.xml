@@ -93,5 +93,16 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@id/start_listen_kb" />
+    <Button
+        android:id="@+id/close_all_sp"
+        android:background="@color/colorPrimary"
+        android:foreground="?android:selectableItemBackground"
+        android:textColor="#fff"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="关闭所有串口"
+        app:layout_constraintLeft_toRightOf="@id/end_listen_kb"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="@id/end_listen_kb" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
