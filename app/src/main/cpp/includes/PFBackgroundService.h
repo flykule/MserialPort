@@ -66,25 +66,25 @@ private:
 
     //instance of promise/future pair that is used for messaging
     PromiseAndFuture<std::string> m_PF;
-
+    IWorker *_worker;
 
 public:
     //stop message
     static constexpr auto STOP = "stop";
 
     template<typename W>
-    PFBackgroundService(W *worker) {
+    PFBackgroundService(W *worker):_worker(worker) {
         m_thread = std::make_unique<std::thread>(
-                [this, worker]() {
+                [this]() {
                     std::string msg;
                     while (true) {
                         if (m_PF.ready()) {
                             msg = m_PF.get();
                             if (msg == PFBackgroundService::STOP) {
-                                worker->stop();
+                                _worker->stop();
                                 break;
                             }
-                            worker->doWork(msg);
+                            _worker->doWork(msg);
                         }
                     }
                 });

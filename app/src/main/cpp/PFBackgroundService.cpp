@@ -9,11 +9,12 @@ void PFBackgroundService::processMessage(std::string msg) {
 
 PFBackgroundService::~PFBackgroundService() {
     try {
+        LOGD("开始销毁后台线程");
         processMessage(PFBackgroundService::STOP);
         if (m_thread->joinable()) {
             m_thread->join();
         }
-        LOGD("后台线程销毁完毕");
+        LOGD("销毁后台线程");
     } catch (...) {
         //todo add some log here, but nothing to do now
     }

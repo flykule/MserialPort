@@ -11,9 +11,8 @@
 
 using namespace mn::CppLinuxSerial;
 
-class SPWriteWorker : IWorker {
+class SPWriteWorker : public IWorker {
 public:
-    using SPWriteWorker::IWorker::stop;
     SPWriteWorker(const char *c_name,const int* baudrate);
     void doWork(std::string &msg);
     virtual ~SPWriteWorker();
