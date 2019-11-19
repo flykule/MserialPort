@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@mipmap/main"
     tools:context=".MainActivity">
 
     <Button
@@ -20,6 +21,17 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
+        android:id="@+id/read_qr_scanner"
+        android:background="@color/colorPrimary"
+        android:foreground="?android:selectableItemBackground"
+        android:textColor="#fff"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="开始读取扫码头"
+        app:layout_constraintLeft_toRightOf="@id/update_time"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="@id/update_time" />
+    <Button
         android:id="@+id/update_version"
         android:background="@color/colorPrimary"
         android:foreground="?android:selectableItemBackground"
@@ -33,6 +45,19 @@
         app:layout_constraintTop_toBottomOf="@id/update_time" />
 
     <Button
+        android:id="@+id/stop_read_qr_scanner"
+        android:background="@color/colorPrimary"
+        android:foreground="?android:selectableItemBackground"
+        android:textColor="#fff"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="停止读取扫码头"
+        app:layout_constraintLeft_toRightOf="@id/update_version"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="@id/update_version" />
+
+
+    <Button
         android:id="@+id/start_listen_kb"
         android:background="@color/colorPrimary"
         android:foreground="?android:selectableItemBackground"
@@ -44,6 +69,18 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@id/update_version" />
+
+    <Button
+        android:id="@+id/start_keyboard_2"
+        android:background="@color/colorPrimary"
+        android:foreground="?android:selectableItemBackground"
+        android:textColor="#fff"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="开启键盘2"
+        app:layout_constraintLeft_toRightOf="@id/update_version"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="@id/update_version" />
     <Button
         android:id="@+id/end_listen_kb"
         android:background="@color/colorPrimary"
