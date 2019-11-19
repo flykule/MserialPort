@@ -72,10 +72,16 @@ public:
     //stop message
     static constexpr auto STOP = "stop";
 
+    //interface method
+    void processMessage(std::string msg);
+
+    //destructor (stops and waits for managed thread to exit)
+    ~PFBackgroundService();
+
     template<typename W>
     PFBackgroundService(W *worker):_worker(worker) {
         m_thread = std::make_unique<std::thread>(
-                [this]() {
+                [&]() {
                     std::string msg;
                     while (true) {
                         if (m_PF.ready()) {
@@ -90,9 +96,4 @@ public:
                 });
     }
 
-    //interface method
-    void processMessage(std::string msg);
-
-    //destructor (stops and waits for managed thread to exit)
-    ~PFBackgroundService();
 };
