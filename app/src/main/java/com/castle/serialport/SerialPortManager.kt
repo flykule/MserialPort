@@ -14,13 +14,12 @@ object SerialPortManager {
     }
 
     /**
-     * 打开一个新串口
+     * 打开一个新串口用于写数据
      * @param path 串口路径,通常为/dev/tty*开头
      * @param baudrate 波特率 拨特率越高, 发送消息越快
-     * @param flags 标记, 1->只写,2->只读,3->读写
      * @param 如果成功,那么返回0,否则为失败
      */
-    external fun openSerialPort(path: String, baudrate: Int, flags: Int)
+    external fun openWriteSerialPort(path: String, baudrate: Int)
 
     /**
      * 关闭串口
@@ -39,10 +38,10 @@ object SerialPortManager {
     external fun sendMessage(path: String, msg: String, flags: Int)
 
     /**
-     * 从指定串口读一次消息,阻塞
+     * 打开一个读串口,用于监听数据
      * @param path 串口路径,通常为/dev/tty*开头
      */
-    external fun testRead(path: String, baudrate: Int, listener: OnReadListener)
+    external fun openReadSerialPort(path: String, baudrate: Int, listener: OnReadListener)
 
     interface OnReadListener {
         fun onDataReceived(msg: ByteArray)

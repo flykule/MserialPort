@@ -18,10 +18,9 @@ class MainActivity : AppCompatActivity() {
 
     val mSerialPortManager by lazy {
         SerialPortManager.apply {
-            openSerialPort(
+            openWriteSerialPort(
                 mScreenPath,
                 9600
-                , FLAG_WRITE
             )
         }
     }
@@ -62,7 +61,7 @@ class MainActivity : AppCompatActivity() {
             mSerialPortManager.sendMessage(mScreenPath, pageCmd("2900", "${version}${version}"), 2);
         }
         start_listen_kb.setOnClickListener {
-            mSerialPortManager.testRead(
+            mSerialPortManager.openReadSerialPort(
                 SERIAL_PORT_NAME_KEYBROAD,
                 9600,
                 object : SerialPortManager.OnReadListener {

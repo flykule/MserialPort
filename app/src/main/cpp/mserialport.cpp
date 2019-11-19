@@ -17,7 +17,6 @@ Java_com_castle_serialport_SerialPortManager_sendMessage(
     const char *msg_utf = env->GetStringUTFChars(msg, nullptr);
     auto message = std::string(msg_utf);
     auto name = std::string(path_utf);
-//    LOGD("发送消息%s给目标%s", msg_utf, path_utf);
     mManager.sendMessage(name, message, SerialPortManager::FLAG_WRITE);
     env->ReleaseStringUTFChars(path, path_utf);
     env->ReleaseStringUTFChars(msg, msg_utf);
@@ -36,19 +35,16 @@ Java_com_castle_serialport_SerialPortManager_closeSerialPort(
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_com_castle_serialport_SerialPortManager_openSerialPort(
+Java_com_castle_serialport_SerialPortManager_openWriteSerialPort(
         JNIEnv *env,
         jobject thiz,
         jstring path,
-        jint baudRate,
-        jint flags
+        jint baudRate
 ) {
     const char *path_utf = env->GetStringUTFChars(path, nullptr);
     std::string name = std::string(path_utf);
-    if (flags & SerialPortManager::FLAG_WRITE) {
-        SPWriteWorker worker = SPWriteWorker(name.c_str(), &baudRate);
-        mManager.addSerialPort(name, (int) flags, &worker);
-    }
+    SPWriteWorker worker = SPWriteWorker(name.c_str(), &baudRate);
+    mManager.addSerialPort(name, SerialPortManager::FLAG_WRITE, &worker);
     env->ReleaseStringUTFChars(path, path_utf);
 }
 
@@ -69,7 +65,7 @@ jint JNI_OnLoad(JavaVM *jvm, void *reserved) {
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_com_castle_serialport_SerialPortManager_testRead(
+Java_com_castle_serialport_SerialPortManager_openReadSerialPort(
         JNIEnv *env,
         jobject thiz,
         jstring path,
