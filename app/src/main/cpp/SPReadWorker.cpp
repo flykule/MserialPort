@@ -58,10 +58,9 @@ void SPReadWorker::stop() {
 SPReadWorker::~SPReadWorker() = default;
 
 SPReadWorker::SPReadWorker(const char *c_name, const int *baudrate, JavaVM *vm,
-                           jobject *callback, jmethodID *methodId) :
+                           jobject *callback) :
         jcallback(callback),
         g_vm(vm),
-        _method_id(methodId),
         env(nullptr) {
     _serialPort = new SerialPort(c_name, *baudrate);
     _serialPort->Open();

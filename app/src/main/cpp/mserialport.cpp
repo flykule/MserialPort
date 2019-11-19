@@ -84,7 +84,6 @@ Java_com_castle_serialport_SerialPortManager_testRead(
     }
     jmethodID javaCallbackId = env->GetMethodID(javaClass,
                                                 "onDataReceived", "([B)V");
-    env->GetJavaVM(&g_vm);
     g_callback = env->NewGlobalRef(callback);
     auto p = new SPReadWorker(name.c_str(), &baudRate, g_vm, &g_callback, &javaCallbackId);
     mManager.addSerialPort(name, SerialPortManager::FLAG_READ, p);

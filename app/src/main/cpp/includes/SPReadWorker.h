@@ -13,7 +13,7 @@ using namespace mn::CppLinuxSerial;
 class SPReadWorker : IWorker {
 public:
     void stop();
-    SPReadWorker(const char *c_name,const int* baudrate, JavaVM *vm,jobject *callback,jmethodID *methodId);
+    SPReadWorker(const char *c_name,const int* baudrate, JavaVM *vm,jobject *callback);
     virtual ~SPReadWorker();
     void doWork(std::string &msg);
 
