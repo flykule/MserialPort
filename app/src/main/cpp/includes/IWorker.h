@@ -11,17 +11,17 @@
 class IWorker {
 
 public:
-    IWorker() {}
+    IWorker() : interrupted(0) {}
 
     virtual void doWork(std::string &msg) = 0;
 
     virtual ~IWorker() {}
 
-    void stop() {
+    virtual void stop() {
         interrupted = -1;
     }
 
-    int isInterrupted() {
+    virtual int isInterrupted() {
         return interrupted;
     }
 

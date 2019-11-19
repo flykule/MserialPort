@@ -46,18 +46,22 @@ void SPReadWorker::stop() {
     g_vm->DetachCurrentThread();
     g_vm = nullptr;
 //    释放你的全局引用的接口，生命周期自己把控
+    _method_id = nullptr;
     env->DeleteGlobalRef(*jcallback);
     jcallback = nullptr;
     env = nullptr;
     IWorker::stop();
 }
 
+
 //会被复制,在这里不做事了
 SPReadWorker::~SPReadWorker() = default;
 
-SPReadWorker::SPReadWorker(const char *c_name, const int *baudrate, JavaVM *vm, jobject *cal) :
+SPReadWorker::SPReadWorker(const char *c_name, const int *baudrate, JavaVM *vm,
+                           jobject *callback, jmethodID *methodId) :
+        jcallback(callback),
         g_vm(vm),
-        jcallback(cal),
+        _method_id(methodId),
         env(nullptr) {
     _serialPort = new SerialPort(c_name, *baudrate);
     _serialPort->Open();
