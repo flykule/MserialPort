@@ -80,6 +80,12 @@ class MainActivity : AppCompatActivity() {
                 SERIAL_PORT_KEYBROAD
             )
         }
+        close_all_sp.setOnClickListener {
+            mSerialPortManager.closeSerialPort(mScreenPath)
+            mSerialPortManager.closeSerialPort(SERIAL_PORT_NAME_KEYBROAD)
+            mSerialPortManager.closeSerialPort(SERIAL_PORT_NAME_QRCODE_SCAN)
+            mSerialPortManager.closeSerialPort(SEARIAL_PORT_NAME_SCREEN_2)
+        }
     }
 
     private fun initListener() {

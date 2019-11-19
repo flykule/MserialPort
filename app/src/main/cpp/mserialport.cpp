@@ -4,7 +4,7 @@
 #include <random>
 #include <SPWriteWorker.h>
 
-static SerialPortManager mManager;
+static SerialPortManager *mManager;
 static JavaVM *g_vm;
 //用于储存读回调
 static std::unordered_map<std::string, jobject> g_callback_map;
@@ -21,7 +21,7 @@ Java_com_castle_serialport_SerialPortManager_sendMessage(
     const char *msg_utf = env->GetStringUTFChars(msg, nullptr);
     auto message = std::string(msg_utf);
     auto name = std::string(path_utf);
-    mManager.sendMessage(name, message, SerialPortManager::FLAG_WRITE);
+    mManager->sendMessage(name, message, SerialPortManager::FLAG_WRITE);
     env->ReleaseStringUTFChars(path, path_utf);
     env->ReleaseStringUTFChars(msg, msg_utf);
 }
@@ -34,7 +34,7 @@ Java_com_castle_serialport_SerialPortManager_closeSerialPort(
 ) {
     const char *path_utf = env->GetStringUTFChars(path, nullptr);
     auto name = std::string(path_utf);
-    mManager.removeSerialPort(name, SerialPortManager::FLAG_WRITE | SerialPortManager::FLAG_READ);
+    mManager->removeSerialPort(name, SerialPortManager::FLAG_WRITE | SerialPortManager::FLAG_READ);
     LOGD("移除完毕,清理回调");
     g_callback_map.erase(name);
     env->ReleaseStringUTFChars(path, path_utf);
@@ -49,7 +49,7 @@ Java_com_castle_serialport_SerialPortManager_openWriteSerialPort(
 ) {
     const char *path_utf = env->GetStringUTFChars(path, nullptr);
     std::string name = std::string(path_utf);
-    mManager.addSerialPort(name, SerialPortManager::FLAG_WRITE,
+    mManager->addSerialPort(name, SerialPortManager::FLAG_WRITE,
                            new SPWriteWorker(name.c_str(), &baudRate));
     env->ReleaseStringUTFChars(path, path_utf);
     LOGD("打开写串口成功");
@@ -57,6 +57,7 @@ Java_com_castle_serialport_SerialPortManager_openWriteSerialPort(
 
 
 jint JNI_OnLoad(JavaVM *jvm, void *reserved) {
+    mManager = new SerialPortManager();
     g_vm = jvm;
     JNIEnv *env;
     LOGD("JNI onload been called");
@@ -78,8 +79,8 @@ Java_com_castle_serialport_SerialPortManager_openReadSerialPort(
     const char *path_utf = env->GetStringUTFChars(path, nullptr);
     auto name = std::string(path_utf);
     g_callback_map[name] = env->NewGlobalRef(callback);
-    mManager.addSerialPort(name, SerialPortManager::FLAG_READ,
+    mManager->addSerialPort(name, SerialPortManager::FLAG_READ,
                            new SPReadWorker(name.c_str(), &baudRate, g_vm, &g_callback_map[name]));
-    mManager.sendMessage(name, start, SerialPortManager::FLAG_READ);
+    mManager->sendMessage(name, start, SerialPortManager::FLAG_READ);
     env->ReleaseStringUTFChars(path, path_utf);
 }
