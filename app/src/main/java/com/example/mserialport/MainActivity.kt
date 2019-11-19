@@ -74,6 +74,12 @@ class MainActivity : AppCompatActivity() {
                     }
                 })
         }
+        start_listen_kb_2.setOnClickListener {
+            mSerialPortManager.openWriteSerialPort(
+                SEARIAL_PORT_NAME_SCREEN_2,
+                SERIAL_PORT_KEYBROAD
+            )
+        }
     }
 
     private fun initListener() {

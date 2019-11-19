@@ -71,7 +71,7 @@
         app:layout_constraintTop_toBottomOf="@id/update_version" />
 
     <Button
-        android:id="@+id/start_keyboard_2"
+        android:id="@+id/start_listen_kb_2"
         android:background="@color/colorPrimary"
         android:foreground="?android:selectableItemBackground"
         android:textColor="#fff"
