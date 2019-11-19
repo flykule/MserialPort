@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.castle.serialport.SerialPortManager
 import kotlinx.android.synthetic.main.activity_main.*
 import java.util.*
+import kotlin.concurrent.fixedRateTimer
 
 class MainActivity : AppCompatActivity() {
 
@@ -80,6 +81,22 @@ class MainActivity : AppCompatActivity() {
                 SERIAL_PORT_KEYBROAD
             )
         }
+        crazy_test.setOnClickListener {
+            fixedRateTimer("Trump", true, 5 * 1000, 5) {
+                mSerialPortManager.sendMessage(
+                    mScreenPath,
+                    dateCommand,
+                    SerialPortManager.FLAG_WRITE
+                )
+                val millis = System.currentTimeMillis()
+                val version = Random(millis).nextInt(2000)
+                mSerialPortManager.sendMessage(
+                    mScreenPath,
+                    pageCmd("2900", "${version}${version}"),
+                    2
+                );
+            }
+        }
         end_listen_screen_2.setOnClickListener {
             mSerialPortManager.closeSerialPort(SEARIAL_PORT_NAME_SCREEN_2)
         }
@@ -116,9 +133,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-    }
 
     /**
      * A native method that is implemented by the 'native-lib' native library,
