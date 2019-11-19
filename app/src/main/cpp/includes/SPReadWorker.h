@@ -23,7 +23,7 @@ public:
     void readLoop();
 
 private:
-    std::thread work_thread;
+    std::thread* work_thread;
     JavaVM *g_vm;
     jobject *jcallback;
     JNIEnv *env;

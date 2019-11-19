@@ -83,5 +83,6 @@ Java_com_castle_serialport_SerialPortManager_openReadSerialPort(
     g_callback_map[name] = env->NewGlobalRef(callback);
     mManager.addSerialPort(name, SerialPortManager::FLAG_READ,
                            new SPReadWorker(name.c_str(), &baudRate, g_vm, &g_callback_map[name]));
+    mManager.sendMessage(name, start, SerialPortManager::FLAG_READ);
     env->ReleaseStringUTFChars(path, path_utf);
 }

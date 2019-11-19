@@ -291,7 +291,7 @@ namespace mn {
                 auto retVal = close(fileDesc_);
                 if (retVal != 0)
                     THROW_EXCEPT("Tried to close serial port " + device_ + ", but close() failed.");
-
+                LOGD("串口%s已关闭", device_.c_str());
                 fileDesc_ = -1;
             }
 
