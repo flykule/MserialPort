@@ -20,7 +20,8 @@ Java_com_castle_serialport_SerialPortManager_sendMessage(
     const char *path_utf = env->GetStringUTFChars(path, nullptr);
     const char *msg_utf = env->GetStringUTFChars(msg, nullptr);
     auto message = std::string(msg_utf);
-    mManager->sendMessage(path_utf, message, SerialPortManager::FLAG_WRITE);
+    auto name = std::string(path_utf);
+    mManager->sendMessage(name, message, SerialPortManager::FLAG_WRITE);
     env->ReleaseStringUTFChars(path, path_utf);
     env->ReleaseStringUTFChars(msg, msg_utf);
 }
@@ -32,7 +33,8 @@ Java_com_castle_serialport_SerialPortManager_closeSerialPort(
         jstring path
 ) {
     const char *path_utf = env->GetStringUTFChars(path, nullptr);
-    mManager->removeSerialPort(path_utf, SerialPortManager::FLAG_WRITE | SerialPortManager::FLAG_READ);
+    auto name = std::string(path_utf);
+    mManager->removeSerialPort(name, SerialPortManager::FLAG_WRITE | SerialPortManager::FLAG_READ);
     g_callback_map.erase(path_utf);
     env->ReleaseStringUTFChars(path, path_utf);
 }
@@ -45,8 +47,9 @@ Java_com_castle_serialport_SerialPortManager_openWriteSerialPort(
         jint baudRate
 ) {
     const char *path_utf = env->GetStringUTFChars(path, nullptr);
+    std::string name = std::string(path_utf);
     mManager->addSerialPort(path_utf, SerialPortManager::FLAG_WRITE,
-                           new SPWriteWorker(path_utf, &baudRate));
+                           new SPWriteWorker(name.c_str(), &baudRate));
     env->ReleaseStringUTFChars(path, path_utf);
     LOGD("打开写串口成功");
 }
@@ -73,9 +76,10 @@ Java_com_castle_serialport_SerialPortManager_openReadSerialPort(
         jobject callback
 ) {
     const char *path_utf = env->GetStringUTFChars(path, nullptr);
+    auto name = std::string(path_utf);
     g_callback_map[path_utf] = env->NewGlobalRef(callback);
     mManager->addSerialPort(path_utf, SerialPortManager::FLAG_READ,
-                           new SPReadWorker(path_utf, &baudRate, g_vm, &g_callback_map[path_utf]));
-    mManager->sendMessage(path_utf, start, SerialPortManager::FLAG_READ);
+                           new SPReadWorker(name.c_str(), &baudRate, g_vm, &g_callback_map[name]));
+    mManager->sendMessage(name, start, SerialPortManager::FLAG_READ);
     env->ReleaseStringUTFChars(path, path_utf);
 }

@@ -24,6 +24,8 @@ SPWriteWorker::SPWriteWorker(const char *c_name, const int *baudrate) :
 
 SPWriteWorker::~SPWriteWorker() {
     LOGD("Write worker get destroyed");
+    _serialPort->Close();
+    _serialPort= nullptr;
 };
 
 void SPWriteWorker::doWork(std::string &msg) {

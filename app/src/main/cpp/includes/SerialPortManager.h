@@ -30,9 +30,9 @@ public:
         return 0;
     }
 
-    int removeSerialPort(const char* path, int flag);
+    int removeSerialPort(std::string path, int flag);
 
-    int sendMessage(const char* path, const std::string &msg, int flag);
+    int sendMessage(std::string path, const std::string &msg, int flag);
 
     static constexpr unsigned int FLAG_WRITE{0x1}; // hex for 0000 0001
     static constexpr unsigned int FLAG_READ{0x2}; // hex for 0000 0010
