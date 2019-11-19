@@ -14,7 +14,6 @@ using namespace mn::CppLinuxSerial;
 class SPReadWorker : public IWorker {
 public:
 
-
     SPReadWorker(const char *c_name, const int *baudrate, JavaVM *vm, jobject *callback);
 
     virtual ~SPReadWorker();

@@ -16,20 +16,16 @@ void SPReadWorker::doWork(std::string &msg) {
 
 SPReadWorker::~SPReadWorker() {
     LOGD("开始销毁SPReadWorker");
-    _serialPort->Close();
-    _serialPort = nullptr;
-    if (g_vm)
-        g_vm->DetachCurrentThread();
-    g_vm = nullptr;
-//    释放你的全局引用的接口，生命周期自己把控
-    if (jcallback)
-        env->DeleteGlobalRef(*jcallback);
-    jcallback = nullptr;
-    env = nullptr;
     if (work_thread->joinable()) {
         work_thread->join();
     }
     work_thread = nullptr;
+    _serialPort->Close();
+    _serialPort = nullptr;
+    g_vm = nullptr;
+//    释放你的全局引用的接口，生命周期自己把控
+    jcallback = nullptr;
+    env = nullptr;
 };
 
 SPReadWorker::SPReadWorker(const char *c_name, const int *baudrate, JavaVM *vm,
@@ -67,6 +63,7 @@ void SPReadWorker::readLoop() {
     }
 
     std::string data;
+    //开始循环
     while (!isInterrupted()) {
         _serialPort->Read(data);
         if (!data.empty()) {
@@ -78,5 +75,9 @@ void SPReadWorker::readLoop() {
             env->CallVoidMethod(*jcallback, javaCallbackId, StringToJByteArray(env, data));
         }
     }
+    if (jcallback)
+        env->DeleteGlobalRef(*jcallback);
+    if (g_vm)
+        g_vm->DetachCurrentThread();
     LOGD("读线程终止运行");
 }
