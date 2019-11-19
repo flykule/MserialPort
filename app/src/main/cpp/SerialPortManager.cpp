@@ -6,7 +6,7 @@
 
 SerialPortManager::SerialPortManager() = default;
 
-int SerialPortManager::removeSerialPort(std::string path, int flag) {
+int SerialPortManager::removeSerialPort(const char* path, int flag) {
     if (flag & FLAG_READ) {
         if (read_map[path]) {
             read_map[path].reset(nullptr);
@@ -23,7 +23,7 @@ int SerialPortManager::removeSerialPort(std::string path, int flag) {
 
 }
 
-int SerialPortManager::sendMessage(std::string path, const std::string &msg, int flag) {
+int SerialPortManager::sendMessage(const char* path, const std::string &msg, int flag) {
     if (flag & FLAG_READ) {
 //        LOGD("发送读数据%s到%s", msg.c_str(), path.c_str());
         if (read_map[path])

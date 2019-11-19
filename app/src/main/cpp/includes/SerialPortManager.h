@@ -18,21 +18,21 @@ public:
     virtual ~SerialPortManager();
 
     template <typename T>
-    int addSerialPort(std::string path, int flag, T* worker) {
+    int addSerialPort(const char* path, int flag, T* worker) {
         if (flag & FLAG_READ) {
             read_map[path] = std::make_unique<PFBackgroundService>(worker);
-            LOGD("添加读串口%s",path.c_str());
+            LOGD("添加读串口%s",path);
         }
         if (flag & FLAG_WRITE) {
             write_map[path] = std::make_unique<PFBackgroundService>(worker);
-            LOGD("添加写串口%s",path.c_str());
+            LOGD("添加写串口%s",path);
         }
         return 0;
     }
 
-    int removeSerialPort(std::string path, int flag);
+    int removeSerialPort(const char* path, int flag);
 
-    int sendMessage(std::string path, const std::string &msg, int flag);
+    int sendMessage(const char* path, const std::string &msg, int flag);
 
     static constexpr unsigned int FLAG_WRITE{0x1}; // hex for 0000 0001
     static constexpr unsigned int FLAG_READ{0x2}; // hex for 0000 0010
