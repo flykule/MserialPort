@@ -78,14 +78,8 @@ Java_com_castle_serialport_SerialPortManager_testRead(
 ) {
     const char *path_utf = env->GetStringUTFChars(path, nullptr);
     auto name = std::string(path_utf);
-    jclass javaClass = env->GetObjectClass(callback);
-    if (javaClass == 0) {
-        std::__throw_runtime_error("获取java回调类失败!");
-    }
-    jmethodID javaCallbackId = env->GetMethodID(javaClass,
-                                                "onDataReceived", "([B)V");
     g_callback = env->NewGlobalRef(callback);
-    auto p = new SPReadWorker(name.c_str(), &baudRate, g_vm, &g_callback, &javaCallbackId);
+    auto p = new SPReadWorker(name.c_str(), &baudRate, g_vm, &g_callback);
     mManager.addSerialPort(name, SerialPortManager::FLAG_READ, p);
     mManager.sendMessage(name, start, SerialPortManager::FLAG_READ);
     env->ReleaseStringUTFChars(path, path_utf);
