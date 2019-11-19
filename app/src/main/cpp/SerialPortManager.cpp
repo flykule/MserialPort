@@ -8,12 +8,16 @@ SerialPortManager::SerialPortManager() = default;
 
 int SerialPortManager::removeSerialPort(std::string path, int flag) {
     if (flag & FLAG_READ) {
-        read_map[path]->processMessage(PFBackgroundService::STOP);
-        read_map.erase(path);
+        if (read_map[path]) {
+            read_map[path].reset(nullptr);
+            read_map.erase(path);
+        }
     }
     if (flag & FLAG_WRITE) {
-        write_map[path]->processMessage(PFBackgroundService::STOP);
-        write_map.erase(path);
+        if (write_map[path]) {
+            write_map[path].reset(nullptr);
+            write_map.erase(path);
+        }
     }
     return 0;
 

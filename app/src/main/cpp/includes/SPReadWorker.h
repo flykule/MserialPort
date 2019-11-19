@@ -13,17 +13,19 @@ using namespace mn::CppLinuxSerial;
 
 class SPReadWorker : IWorker {
 public:
-    void stop();
+
+    using IWorker::stop;
 
     SPReadWorker(const char *c_name, const int *baudrate, JavaVM *vm, jobject *callback);
 
     virtual ~SPReadWorker();
 
     void doWork(std::string &msg);
+
     void readLoop();
 
 private:
-    std::thread* work_thread;
+    std::thread *work_thread;
     JavaVM *g_vm;
     jobject *jcallback;
     JNIEnv *env;

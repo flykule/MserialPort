@@ -13,6 +13,7 @@ PFBackgroundService::~PFBackgroundService() {
         if (m_thread->joinable()) {
             m_thread->join();
         }
+        LOGD("后台线程销毁完毕");
     } catch (...) {
         //todo add some log here, but nothing to do now
     }

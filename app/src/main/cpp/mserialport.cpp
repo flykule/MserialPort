@@ -34,12 +34,9 @@ Java_com_castle_serialport_SerialPortManager_closeSerialPort(
 ) {
     const char *path_utf = env->GetStringUTFChars(path, nullptr);
     auto name = std::string(path_utf);
-//    if (g_callback_map.find(name) != g_callback_map.end()) {
-//        env->DeleteGlobalRef(g_callback_map[name]);
-//    }
-//    g_callback_map.erase(name);
-    mManager.sendMessage(name, PFBackgroundService::STOP, SerialPortManager::FLAG_READ);
-//    mManager.removeSerialPort(name, SerialPortManager::FLAG_WRITE | SerialPortManager::FLAG_READ);
+    mManager.removeSerialPort(name, SerialPortManager::FLAG_WRITE | SerialPortManager::FLAG_READ);
+    LOGD("移除完毕,清理回调");
+    g_callback_map.erase(name);
     env->ReleaseStringUTFChars(path, path_utf);
 }
 
