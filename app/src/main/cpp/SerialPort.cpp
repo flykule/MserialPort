@@ -273,6 +273,7 @@ namespace mn {
 
         void SerialPort::SetTermios(termios myTermios) {
             // Flush port, then apply attributes
+            usleep(10000);
             tcflush(fileDesc_, TCIFLUSH);
 
             if (tcsetattr(fileDesc_, TCSANOW, &myTermios) != 0) {
