@@ -23,16 +23,20 @@ int SerialPortManager::removeSerialPort(std::string path, int flag) {
 
 }
 
-int SerialPortManager::sendMessage(std::string path, const std::string &msg, int flag) {
+int
+SerialPortManager::sendMessage(std::string path, const std::vector<std::string> msg, int flag) {
+
     if (flag & FLAG_READ) {
 //        LOGD("发送读数据%s到%s", msg.c_str(), path.c_str());
         if (read_map[path])
-            read_map[path]->processMessage(msg);
+            read_map[path]->
+                    processMessage(msg);
     }
     if (flag & FLAG_WRITE) {
 //        LOGD("发送写数据%s到%s", msg.c_str(), path.c_str());
         if (write_map[path])
-            write_map[path]->processMessage(msg);
+            write_map[path]->
+                    processMessage(msg);
     }
     return 0;
 }
@@ -45,5 +49,6 @@ SerialPortManager::~SerialPortManager() {
         removeSerialPort(r.first, FLAG_WRITE);
     }
 }
+
 
 

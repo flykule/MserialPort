@@ -6,6 +6,7 @@
 #define MSERIALPORT_IWORKER_H
 
 #include <jni.h>
+#include <vector>
 #include <string>
 
 class IWorker {
@@ -13,7 +14,7 @@ class IWorker {
 public:
     IWorker() : interrupted(0) {}
 
-    virtual void doWork(std::string &msg) = 0;
+    virtual void doWork(const std::vector<std::string> msgs) = 0;
 
     virtual ~IWorker() {}
 

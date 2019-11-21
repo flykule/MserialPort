@@ -83,18 +83,14 @@ class MainActivity : AppCompatActivity() {
         }
         crazy_test.setOnClickListener {
             fixedRateTimer("Trump", true, 5 * 1000, 5) {
-                mSerialPortManager.sendMessage(
-                    mScreenPath,
-                    dateCommand,
-                    SerialPortManager.FLAG_WRITE
-                )
                 val millis = System.currentTimeMillis()
                 val version = Random(millis).nextInt(2000)
+                val pageCmd = pageCmd("2900", "${version}${version}")
                 mSerialPortManager.sendMessage(
                     mScreenPath,
-                    pageCmd("2900", "${version}${version}"),
-                    2
-                );
+                    arrayOf(dateCommand, pageCmd),
+                    SerialPortManager.FLAG_WRITE
+                )
             }
         }
         end_listen_screen_2.setOnClickListener {
@@ -110,13 +106,21 @@ class MainActivity : AppCompatActivity() {
 
     private fun initListener() {
         update_time.setOnClickListener {
-            mSerialPortManager.sendMessage(mScreenPath, dateCommand, SerialPortManager.FLAG_WRITE)
+            mSerialPortManager.sendMessage(
+                mScreenPath,
+                arrayOf(dateCommand),
+                SerialPortManager.FLAG_WRITE
+            )
         }
 
         update_version.setOnClickListener {
             val millis = System.currentTimeMillis()
             val version = Random(millis).nextInt(2000)
-            mSerialPortManager.sendMessage(mScreenPath, pageCmd("2900", "${version}${version}"), 2);
+            mSerialPortManager.sendMessage(
+                mScreenPath,
+                arrayOf(pageCmd("2900", "${version}${version}")),
+                2
+            );
         }
         start_listen_kb.setOnClickListener {
             mSerialPortManager.openReadSerialPort(

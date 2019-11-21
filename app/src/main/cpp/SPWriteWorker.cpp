@@ -25,10 +25,18 @@ SPWriteWorker::SPWriteWorker(const char *c_name, const int *baudrate) :
 SPWriteWorker::~SPWriteWorker() {
     LOGD("Write worker get destroyed");
     _serialPort->Close();
-    _serialPort= nullptr;
+    _serialPort = nullptr;
 };
 
-void SPWriteWorker::doWork(std::string &msg) {
+void SPWriteWorker::doWork(const std::vector<std::string> msgs) {
+    std::lock_guard<std::mutex> lockGuard(m_mutex);
+    for (auto m:msgs) {
+        internalWork(m);
+    }
+}
+
+void SPWriteWorker::internalWork(std::string &msg) {
+    LOGD("Transform...%s", msg.c_str());
     int len = msg.length() / 2;
     char temp[len];
     HexToBytes(msg, temp);

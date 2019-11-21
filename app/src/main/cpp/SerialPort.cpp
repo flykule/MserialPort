@@ -11,8 +11,8 @@
 #include <androidLog.h>
 #include <iostream>
 #include <sstream>
-#include <stdio.h>    // Standard input/output definitions
-#include <string.h>    // String function definitions
+#include <cstdio>    // Standard input/output definitions
+#include <cstring>    // String function definitions
 #include <unistd.h>    // UNIX standard function definitions
 #include <fcntl.h>    // File control definitions
 #include <cerrno>    // Error number definitions

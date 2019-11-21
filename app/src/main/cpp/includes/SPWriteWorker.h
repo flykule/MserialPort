@@ -14,10 +14,12 @@ using namespace mn::CppLinuxSerial;
 class SPWriteWorker : public IWorker {
 public:
     SPWriteWorker(const char *c_name,const int* baudrate);
-    void doWork(std::string &msg);
+    void doWork(const std::vector<std::string> msgs);
     virtual ~SPWriteWorker();
 private:
+    void internalWork(std::string& msg);
     SerialPort* _serialPort;
+    std::mutex m_mutex;
 };
 
 

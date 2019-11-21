@@ -8,6 +8,7 @@ object SerialPortManager {
     const val FLAG_WRITE = 1;
     //读flag
     const val FLAG_READ = 2;
+
     init {
         Log.d("SerialPortManager", "开始加载库")
         System.loadLibrary("mserialport")
@@ -35,7 +36,7 @@ object SerialPortManager {
      * @param flags 标记, 1->只写,2->只读,3->读写
      * @return 如果失败,底层会直接抛出异常
      */
-    external fun sendMessage(path: String, msg: String, flags: Int)
+    external fun sendMessage(path: String, msg: Array<String>, flags: Int = FLAG_WRITE)
 
     /**
      * 打开一个读串口,用于监听数据

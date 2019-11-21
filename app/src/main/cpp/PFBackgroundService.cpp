@@ -1,16 +1,16 @@
 #include <PFBackgroundService.h>
 
-void PFBackgroundService::processMessage(std::string msg) {
+void PFBackgroundService::processMessage(const std::vector<std::string> msgs) {
     bool success = false;
     while (!success) {
-        success = m_PF.set(msg);
+        success = m_PF.set(msgs);
     }
 }
 
 PFBackgroundService::~PFBackgroundService() {
     try {
         LOGD("开始销毁后台线程");
-        processMessage(PFBackgroundService::STOP);
+        processMessage({PFBackgroundService::STOP});
         if (m_thread->joinable()) {
             m_thread->join();
         }

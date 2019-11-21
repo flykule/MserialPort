@@ -10,7 +10,7 @@ static jbyteArray StringToJByteArray(JNIEnv *env, const std::string &nativeStrin
     return arr;
 }
 
-void SPReadWorker::doWork(std::string &msg) {
+void SPReadWorker::doWork(const std::vector<std::string> msgs) {
     work_thread = new std::thread(&SPReadWorker::readLoop, this);
 }
 

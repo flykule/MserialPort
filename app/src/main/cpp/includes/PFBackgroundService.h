@@ -8,6 +8,7 @@
 #include <iostream>
 #include <IWorker.h>
 #include <androidLog.h>
+#include <initializer_list>
 
 class PFBackgroundService : public IBackgroundService {
 private:
@@ -65,15 +66,14 @@ private:
     std::unique_ptr<std::thread> m_thread;
 
     //instance of promise/future pair that is used for messaging
-    PromiseAndFuture<std::string> m_PF;
+    PromiseAndFuture<const std::vector<std::string>> m_PF;
     IWorker *_worker;
 
 public:
     //stop message
     static constexpr auto STOP = "stop";
 
-    //interface method
-    void processMessage(std::string msg);
+    void processMessage(const std::vector<std::string> msgs);
 
     //destructor (stops and waits for managed thread to exit)
     ~PFBackgroundService();
@@ -82,11 +82,11 @@ public:
     PFBackgroundService(W *worker):_worker(worker) {
         m_thread = std::make_unique<std::thread>(
                 [&]() {
-                    std::string msg;
+                    std::vector<std::string> msg;
                     while (true) {
                         if (m_PF.ready()) {
                             msg = m_PF.get();
-                            if (msg == PFBackgroundService::STOP) {
+                            if (msg[0] == PFBackgroundService::STOP) {
                                 _worker->stop();
                                 break;
                             }
