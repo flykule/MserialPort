@@ -2,6 +2,7 @@
 // Created by Administrator on 2019/11/18.
 //
 
+#include <unistd.h>
 #include "includes/SPReadWorker.h"
 
 static jbyteArray StringToJByteArray(JNIEnv *env, const std::string &nativeString) {
@@ -79,6 +80,7 @@ void SPReadWorker::readLoop() {
             }
             env->CallVoidMethod(*jcallback, javaCallbackId, StringToJByteArray(env, data));
         }
+        usleep(200);
     }
     LOGD("读线程终止运行");
     if (jcallback)
