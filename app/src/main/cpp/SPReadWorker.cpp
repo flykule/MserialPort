@@ -35,7 +35,6 @@ SPReadWorker::SPReadWorker(const char *c_name, const int *baudrate, JavaVM *vm,
         work_thread(nullptr),
         g_vm(vm),
         env(nullptr) {
-    LOGD("销毁读worker %s", c_name);
     _serialPort = new SerialPort(c_name, *baudrate);
     //non-blocking read
     _serialPort->SetTimeout(10);
@@ -80,7 +79,7 @@ void SPReadWorker::readLoop() {
             }
             env->CallVoidMethod(*jcallback, javaCallbackId, StringToJByteArray(env, data));
         }
-        usleep(200);
+//        usleep(200);
     }
     LOGD("读线程终止运行");
     if (jcallback)
