@@ -77,7 +77,8 @@ namespace mn {
 
             // O_RDONLY for read-only, O_WRONLY for write only, O_RDWR for both read/write access
             // 3rd, optional parameter is mode_t mode
-            fileDesc_ = open(device_.c_str(), O_RDWR);
+//            fileDesc_ = open(device_.c_str(), O_RDWR | O_NONBLOCK | O_CLOEXEC);
+            fileDesc_ = open(device_.c_str(), O_RDWR | O_CLOEXEC);
 
             // Check status
             if (fileDesc_ == -1) {
@@ -91,11 +92,11 @@ namespace mn {
 //            tcgetattr(fileDesc_, &cfg);
 //
 //            cfmakeraw(&cfg);
-//            cfsetispeed(&cfg, B9600);
-//            cfsetospeed(&cfg, B9600);
+//            cfsetispeed(&cfg, getBaudrate(custom_baudRate));
+//            cfsetospeed(&cfg, getBaudrate(custom_baudRate));
 //            this->SetTermios(cfg);
 
-            std::cout << "COM port opened successfully." << std::endl;
+//            std::cout << "COM port opened successfully." << std::endl;
             state_ = State::OPEN;
         }
 
@@ -113,13 +114,13 @@ namespace mn {
 
             //================= (.c_cflag) ===============//
 
-            tty.c_cflag &= ~PARENB;        // No parity bit is added to the output characters
-            tty.c_cflag &= ~CSTOPB;        // Only one stop-bit is used
-            tty.c_cflag &= ~CSIZE;            // CSIZE is a mask for the number of bits per character
-            tty.c_cflag |= CS8;            // Set to 8 bits per character
-            tty.c_cflag &= ~CRTSCTS;       // Disable hadrware flow control (RTS/CTS)
-            tty.c_cflag |= CREAD |
-                           CLOCAL;                    // Turn on READ & ignore ctrl lines (CLOCAL = 1)
+//            tty.c_cflag &= ~PARENB;        // No parity bit is added to the output characters
+//            tty.c_cflag &= ~CSTOPB;        // Only one stop-bit is used
+//            tty.c_cflag &= ~CSIZE;            // CSIZE is a mask for the number of bits per character
+//            tty.c_cflag |= CS8;            // Set to 8 bits per character
+//            tty.c_cflag &= ~CRTSCTS;       // Disable hadrware flow control (RTS/CTS)
+//            tty.c_cflag |= CREAD |
+//                           CLOCAL;                    // Turn on READ & ignore ctrl lines (CLOCAL = 1)
 
 
             //===================== (Baudrate) =================//
@@ -128,8 +129,8 @@ namespace mn {
 
             //===================== (.c_oflag) =================//
 
-            tty.c_oflag = 0;              // No remapping, no delays
-            tty.c_oflag &= ~OPOST;            // Make raw
+//            tty.c_oflag = 0;              // No remapping, no delays
+//            tty.c_oflag &= ~OPOST;            // Make raw
 
             //================= CONTROL CHARACTERS (.c_cc[]) ==================//
 
@@ -160,8 +161,8 @@ namespace mn {
 
             //======================== (.c_iflag) ====================//
 
-            tty.c_iflag &= ~(IXON | IXOFF | IXANY);            // Turn off s/w flow ctrl
-            tty.c_iflag &= ~(IGNBRK | BRKINT | PARMRK | ISTRIP | INLCR | IGNCR | ICRNL);
+//            tty.c_iflag &= ~(IXON | IXOFF | IXANY);            // Turn off s/w flow ctrl
+//            tty.c_iflag &= ~(IGNBRK | BRKINT | PARMRK | ISTRIP | INLCR | IGNCR | ICRNL);
 
 
 
@@ -169,18 +170,17 @@ namespace mn {
 
             // Canonical input is when read waits for EOL or EOF characters before returning. In non-canonical mode, the rate at which
             // read() returns is instead controlled by c_cc[VMIN] and c_cc[VTIME]
-            tty.c_lflag &= ~ICANON;                                // Turn off canonical input, which is suitable for pass-through
-            echo_ ? (tty.c_lflag | ECHO) : (tty.c_lflag &
-                                            ~(ECHO));    // Configure echo depending on echo_ boolean
-            tty.c_lflag &= ~ECHOE;                                // Turn off echo erase (echo erase only relevant if canonical input is active)
-            tty.c_lflag &= ~ECHONL;                                //
-            tty.c_lflag &= ~ISIG;                                // Disables recognition of INTR (interrupt), QUIT and SUSP (suspend) characters
+//            tty.c_lflag &= ~ICANON;                                // Turn off canonical input, which is suitable for pass-through
+//            echo_ ? (tty.c_lflag | ECHO) : (tty.c_lflag &
+//                                            ~(ECHO));    // Configure echo depending on echo_ boolean
+//            tty.c_lflag &= ~ECHOE;                                // Turn off echo erase (echo erase only relevant if canonical input is active)
+//            tty.c_lflag &= ~ECHONL;                                //
+//            tty.c_lflag &= ~ISIG;                                // Disables recognition of INTR (interrupt), QUIT and SUSP (suspend) characters
 
 
 
             // Try and use raw function call
-            //cfmakeraw(&tty);
-
+            cfmakeraw(&tty);
             this->SetTermios(tty);
 
             /*
@@ -331,6 +331,7 @@ namespace mn {
             }
 
             int writeResult = write(fileDesc_, bytes, static_cast<size_t>(len));
+            tcdrain(fileDesc_);
 
             // Check status
             if (writeResult == -1) {

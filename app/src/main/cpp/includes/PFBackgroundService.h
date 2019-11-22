@@ -87,6 +87,9 @@ public:
                         if (m_PF.ready()) {
                             msg = m_PF.get();
                             if (msg[0] == PFBackgroundService::STOP) {
+                                LOGD("执行打断worker");
+//                                delete _worker;
+//                                _worker = nullptr;
                                 _worker->stop();
                                 break;
                             }

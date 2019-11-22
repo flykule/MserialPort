@@ -131,6 +131,8 @@ class MainActivity : AppCompatActivity() {
                         println("接受到键盘消息${HexUtils.bytesToHexString(msg)}")
                     }
                 });
+            mSerialPortManager.openWriteSerialPort(SERIAL_PORT_NAME_KEYBROAD,9600)
+            mSerialPortManager.sendMessage(SERIAL_PORT_NAME_KEYBROAD, arrayOf("0000"))
         }
         end_listen_kb.setOnClickListener {
             mSerialPortManager.closeSerialPort(SERIAL_PORT_NAME_KEYBROAD);

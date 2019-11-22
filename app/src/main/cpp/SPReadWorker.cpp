@@ -15,7 +15,7 @@ void SPReadWorker::doWork(const std::vector<std::string> msgs) {
 }
 
 SPReadWorker::~SPReadWorker() {
-    LOGD("开始销毁SPReadWorker");
+    LOGD("开始销毁SPReadWorker,是否已经被中止%d", stopRequested() ? 1 : 0);
     if (work_thread->joinable()) {
         work_thread->join();
     }
@@ -34,10 +34,16 @@ SPReadWorker::SPReadWorker(const char *c_name, const int *baudrate, JavaVM *vm,
         work_thread(nullptr),
         g_vm(vm),
         env(nullptr) {
+    LOGD("销毁读worker %s", c_name);
     _serialPort = new SerialPort(c_name, *baudrate);
     //non-blocking read
-    _serialPort->SetTimeout(0);
+    _serialPort->SetTimeout(10);
     _serialPort->Open();
+    if (_serialPort->currendState() == State::OPEN) {
+        LOGD("打开读串口%s成功", c_name);
+    } else {
+        LOGD("打开读串口%s失败", c_name);
+    }
 }
 
 void SPReadWorker::readLoop() {
@@ -64,20 +70,19 @@ void SPReadWorker::readLoop() {
 
     std::string data;
     //开始循环
-    while (!isInterrupted()) {
+    while (!stopRequested()) {
         _serialPort->Read(data);
         if (!data.empty()) {
             //执行回调
-            if (*jcallback == nullptr) {
-                LOGD("因为获取不到回调而停止");
-                stop();
+            if (stopRequested()) {
+                break;
             }
             env->CallVoidMethod(*jcallback, javaCallbackId, StringToJByteArray(env, data));
         }
     }
+    LOGD("读线程终止运行");
     if (jcallback)
         env->DeleteGlobalRef(*jcallback);
     if (g_vm)
         g_vm->DetachCurrentThread();
-    LOGD("读线程终止运行");
 }

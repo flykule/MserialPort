@@ -4,6 +4,7 @@
 
 #include <SPWriteWorker.h>
 #include <androidLog.h>
+#include <unistd.h>
 
 const int BIT16 = 16;
 
@@ -18,6 +19,7 @@ static void HexToBytes(const std::string &hex, char *result) {
 
 SPWriteWorker::SPWriteWorker(const char *c_name, const int *baudrate) :
         _serialPort(new SerialPort(c_name, *baudrate)) {
+    _serialPort->SetTimeout(0);
     _serialPort->Open();
     LOGD("打开串口%s成功", c_name);
 }
@@ -36,7 +38,6 @@ void SPWriteWorker::doWork(const std::vector<std::string> msgs) {
 }
 
 void SPWriteWorker::internalWork(std::string &msg) {
-    LOGD("Transform...%s", msg.c_str());
     int len = msg.length() / 2;
     char temp[len];
     HexToBytes(msg, temp);

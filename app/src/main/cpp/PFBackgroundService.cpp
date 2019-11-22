@@ -14,8 +14,6 @@ PFBackgroundService::~PFBackgroundService() {
         if (m_thread->joinable()) {
             m_thread->join();
         }
-        delete _worker;
-        _worker = nullptr;
         LOGD("销毁后台线程");
     } catch (...) {
         //todo add some log here, but nothing to do now
