@@ -50,7 +50,7 @@ void SPReadWorker::readLoop() {
     int getEnvStat = g_vm->GetEnv(reinterpret_cast<void **>(&env), JNI_VERSION_1_6);
     if (getEnvStat == JNI_EDETACHED) {
         //如果没有， 主动附加到jvm环境中，获取到env
-        if (g_vm->AttachCurrentThreadAsDaemon(&env, nullptr) != 0) {
+        if (g_vm->AttachCurrentThread(&env, nullptr) != 0) {
             std::__throw_runtime_error("获取java虚拟机实例失败!");
         }
     }
@@ -69,8 +69,15 @@ void SPReadWorker::readLoop() {
     }
 
     std::string data;
+    int byte_read;
     //开始循环
     while (!stopRequested()) {
+        ioctl(_serialPort->getFileDescriptor(), FIONREAD, &byte_read);
+        if (byte_read <= 0) {
+            LOGD("没消息,睡觉");
+            usleep(read_interval);
+            continue;
+        }
         _serialPort->Read(data);
         if (!data.empty()) {
             //执行回调
@@ -79,7 +86,6 @@ void SPReadWorker::readLoop() {
             }
             env->CallVoidMethod(*jcallback, javaCallbackId, StringToJByteArray(env, data));
         }
-//        usleep(200);
     }
     LOGD("读线程终止运行");
     if (jcallback)

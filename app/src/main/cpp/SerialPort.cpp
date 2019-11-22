@@ -78,7 +78,7 @@ namespace mn {
             // O_RDONLY for read-only, O_WRONLY for write only, O_RDWR for both read/write access
             // 3rd, optional parameter is mode_t mode
 //            fileDesc_ = open(device_.c_str(), O_RDWR | O_NONBLOCK | O_CLOEXEC);
-            fileDesc_ = open(device_.c_str(), O_RDWR | O_CLOEXEC);
+            fileDesc_ = open(device_.c_str(), O_RDWR | O_NONBLOCK | O_NOCTTY | O_CLOEXEC);
 
             // Check status
             if (fileDesc_ == -1) {
@@ -86,15 +86,15 @@ namespace mn {
                              ". Is the device name correct and do you have read/write permission?");
             }
 
-            ConfigureTermios();
+//            ConfigureTermios();
 
-//            struct termios cfg;
-//            tcgetattr(fileDesc_, &cfg);
-//
-//            cfmakeraw(&cfg);
-//            cfsetispeed(&cfg, getBaudrate(custom_baudRate));
-//            cfsetospeed(&cfg, getBaudrate(custom_baudRate));
-//            this->SetTermios(cfg);
+            struct termios cfg;
+            tcgetattr(fileDesc_, &cfg);
+
+            cfmakeraw(&cfg);
+            cfsetispeed(&cfg, getBaudrate(custom_baudRate));
+            cfsetospeed(&cfg, getBaudrate(custom_baudRate));
+            this->SetTermios(cfg);
 
 //            std::cout << "COM port opened successfully." << std::endl;
             state_ = State::OPEN;

@@ -23,6 +23,7 @@ public:
     void readLoop();
 
 private:
+    static constexpr auto read_interval = 2000
     std::thread *work_thread;
     JavaVM *g_vm;
     jobject *jcallback;
