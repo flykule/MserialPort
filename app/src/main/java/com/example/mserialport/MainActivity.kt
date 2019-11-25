@@ -15,12 +15,12 @@ class MainActivity : AppCompatActivity() {
 
     private val mScreenPath = "/dev/ttysWK0"
     val SERIAL_PORT_NAME_KEYBROAD = "/dev/ttysWK2"//键盘对应的串口名
-    val SERIAL_PORT_KEYBROAD = 9600//键盘串口的波特率
+    val SERIAL_PORT_KEYBROAD = 1200//键盘串口的波特率
     val SERIAL_PORT_NAME_QRCODE_SCAN = "/dev/ttysWK3"//扫码头串口名
-    val SERIAL_PORT_QRCODE_SCAN = 9600//二维码扫码器波特率
+    val SERIAL_PORT_QRCODE_SCAN = 2400//二维码扫码器波特率
 
     val SEARIAL_PORT_NAME_SCREEN_2 = "/dev/ttyHSL0"//屏幕2串口
-    val SERIAL_PORT_SCREEN_2 = 9600//屏幕串口的波特率
+    val SERIAL_PORT_SCREEN_2 = 2400//屏幕串口的波特率
     val SERIAL_PORT_NAME_CARDCODE_SCAN = "/dev/ttysWK1"//读卡器串口名
     val SERIAL_PORT_CARDCODE_SCAN = 57600//读卡器波特率
 
@@ -114,6 +114,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         update_version.setOnClickListener {
+            SerialPortManager.openWriteSerialPort(mScreenPath, SERIAL_PORT_SCREEN_2)
             val millis = System.currentTimeMillis()
             val version = Random(millis).nextInt(2000)
             SerialPortManager.sendMessage(
@@ -121,17 +122,18 @@ class MainActivity : AppCompatActivity() {
                 arrayOf(pageCmd("2900", "${version}${version}")),
                 2
             );
+            SerialPortManager.closeSerialPort(mScreenPath)
         }
         start_listen_kb.setOnClickListener {
             SerialPortManager.openReadSerialPort(
                 SERIAL_PORT_NAME_KEYBROAD,
-                9600,
+                SERIAL_PORT_KEYBROAD,
                 object : SerialPortManager.OnReadListener {
                     override fun onDataReceived(msg: ByteArray) {
                         println("接受到键盘消息${HexUtils.bytesToHexString(msg)}")
                     }
                 });
-            SerialPortManager.openWriteSerialPort(SERIAL_PORT_NAME_KEYBROAD,9600)
+            SerialPortManager.openWriteSerialPort(SERIAL_PORT_NAME_KEYBROAD, 9600)
             SerialPortManager.sendMessage(SERIAL_PORT_NAME_KEYBROAD, arrayOf("0000"))
         }
         end_listen_kb.setOnClickListener {

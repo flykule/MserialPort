@@ -37,7 +37,7 @@ SPReadWorker::SPReadWorker(const char *c_name, const int *baudrate, JavaVM *vm,
         env(nullptr) {
     _serialPort = new SerialPort(c_name, *baudrate);
     //non-blocking read
-    _serialPort->SetTimeout(10);
+    _serialPort->SetTimeout(-1);
     _serialPort->Open();
     if (_serialPort->currendState() == State::OPEN) {
         LOGD("打开读串口%s成功", c_name);
