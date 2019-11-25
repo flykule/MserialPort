@@ -74,7 +74,7 @@ private:
     //instance of promise/future pair that is used for messaging
     PromiseAndFuture<const std::vector<std::string> &> m_PF;
     static constexpr auto read_interval = 15000;
-    static constexpr auto write_interval = 5000;
+    static constexpr auto write_interval = 1000;
     std::mutex m_mutex;
     std::thread *read_thread;
     bool isSending;

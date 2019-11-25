@@ -130,7 +130,7 @@ void SPReadWriteWorker::writeLoop() {
         m_mutex.lock();
         while (mMessages.empty()) {
             m_mutex.unlock();
-            usleep(1000);
+            usleep(write_interval);
             m_mutex.lock();
         }
         auto commands = mMessages.front();
