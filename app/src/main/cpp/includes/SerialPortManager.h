@@ -17,6 +17,9 @@ public:
     virtual ~SerialPortManager();
 
     int addSerialPort(const char *path, std::unique_ptr<IWorker> worker) {
+        if (inner_map[path]) {
+            removeSerialPort(path);
+        }
         inner_map[path] = std::move(worker);
         LOGD("添加串口%s", path);
         return 0;

@@ -128,6 +128,7 @@ void SPReadWriteWorker::writeLoop() {
         if (m_PF.ready()) {
             auto commands = m_PF.get();
             for (auto &&c:commands) {
+                LOGD("处理消息%s", c.c_str());
                 writeMessage(c);
             }
         }
