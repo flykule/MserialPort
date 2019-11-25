@@ -118,20 +118,26 @@ void SPReadWriteWorker::writeMessage(const std::vector<std::string> &messages) {
         int len = c.length() / 2;
         char temp[len];
         HexToBytes(c, temp);
+        if (stopRequested()) {
+            return;
+        }
         _serialPort->Write(temp, len);
     }
 }
 
 void SPReadWriteWorker::writeLoop() {
     while (!stopRequested()) {
-        if (!mMessages.empty()) {
-            m_mutex.lock();
-            auto commands = mMessages.front();
-            writeMessage(commands);
-            mMessages.pop();
+        m_mutex.lock();
+        while (mMessages.empty()) {
             m_mutex.unlock();
+            usleep(1000);
+            m_mutex.lock();
         }
-        usleep(write_interval);
+        auto commands = mMessages.front();
+        writeMessage(commands);
+        mMessages.pop();
+        m_mutex.unlock();
     }
+    LOGD("写线程终止运行");
 }
 
