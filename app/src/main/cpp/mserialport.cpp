@@ -22,7 +22,7 @@ Java_com_castle_serialport_SerialPortManager_sendMessage(
     int stringCount = env->GetArrayLength(commands);
     std::vector<std::string> msgs;
     for (int i = 0; i < stringCount; ++i) {
-        jstring message = static_cast<jstring>(env->GetObjectArrayElement(commands, i));
+        auto message = static_cast<jstring>(env->GetObjectArrayElement(commands, i));
         const char *msg_utf = env->GetStringUTFChars(message, nullptr);
         msgs.emplace_back(std::string(msg_utf));
         env->ReleaseStringUTFChars(message, msg_utf);

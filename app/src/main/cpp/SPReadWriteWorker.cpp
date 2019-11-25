@@ -24,7 +24,7 @@ static void HexToBytes(const std::string &hex, char *result) {
 SPReadWriteWorker::SPReadWriteWorker(std::string &name, const int &baudrate, JavaVM *vm,
                                      jobject *callback) :
         jcallback(callback),
-        work_thread(nullptr),
+        read_thread(nullptr),
         g_vm(vm),
         env(nullptr) {
     _serialPort = new SerialPort(name, baudrate);
@@ -35,16 +35,18 @@ SPReadWriteWorker::SPReadWriteWorker(std::string &name, const int &baudrate, Jav
     } else {
         LOGD("打开读串口%s失败", name.c_str());
     }
+    write_thread = new std::thread(&SPReadWriteWorker::writeLoop, this);
 
 }
 
 void SPReadWriteWorker::doWork(const std::vector<std::string> &msgs) {
-    if (msgs[0] == "start") {
-        work_thread = new std::thread(&SPReadWriteWorker::readLoop, this);
+    if (msgs[0] == START_READ) {
+        read_thread = new std::thread(&SPReadWriteWorker::readLoop, this);
     } else {
-        std::lock_guard<std::mutex> lockGuard(m_mutex);
-        for (auto m:msgs) {
-            writeMessage(m);
+        bool success = false;
+        while (!success) {
+            success = m_PF.set(msgs);
+            usleep(500);
         }
     }
 }
@@ -105,5 +107,16 @@ void SPReadWriteWorker::writeMessage(const std::string &msg) {
     char temp[len];
     HexToBytes(msg, temp);
     _serialPort->Write(temp, len);
+}
+
+void SPReadWriteWorker::writeLoop() {
+    while (!stopRequested()) {
+        if (m_PF.ready()) {
+            auto commands = m_PF.get();
+            for (auto &&c:commands) {
+                writeMessage(c);
+            }
+        }
+    }
 }
 

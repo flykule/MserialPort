@@ -10,8 +10,57 @@
 #include <unistd.h>
 
 using namespace mn::CppLinuxSerial;
+static constexpr auto START_READ = "start_read";
 
 class SPReadWriteWorker : public IWorker {
+
+    template<typename T>
+    struct PromiseAndFuture {
+        std::unique_ptr<std::promise<T>> m_promise;
+        std::unique_ptr<std::future<T>> m_future;
+        std::mutex m_mutex;
+
+        //constructor
+        PromiseAndFuture() {
+            reset();
+        }
+
+        //reset the managed promise and future objects to new ones
+        void reset() {
+            m_promise.reset(nullptr);
+            m_future.reset(nullptr);
+            m_promise = std::make_unique<std::promise<T>>();
+            m_future = std::make_unique<std::future<T>>(m_promise->get_future());
+        }
+
+        //non-blocking function that returns whether or not the
+        //managed future object is ready, i.e., has a valid value
+        bool ready() {
+            std::future_status status = m_future->wait_for(std::chrono::milliseconds(0));
+            return (status == std::future_status::ready);
+        }
+
+        //blocking function that retrieves and returns value in
+        //managed future object
+        T get() {
+            std::lock_guard<std::mutex> lockGuard(m_mutex);
+            T ret = m_future->get();
+            reset();
+            return ret;
+        }
+
+        //set the value on the managed promise object to val,
+        //thereby making the future "ready" and contain val
+        bool set(T val) {
+            std::lock_guard<std::mutex> lockGuard(m_mutex);
+            //don't
+            if (ready()) {
+                return false;
+            }
+            m_promise->set_value(val);
+            return true;
+        }
+    };
 
     void doWork(const std::vector<std::string> &msgs) override;
 
@@ -19,14 +68,19 @@ class SPReadWriteWorker : public IWorker {
 
     void readLoop();
 
+    void writeLoop();
+
     virtual ~SPReadWriteWorker();
 
 private:
-    void writeMessage(const std::string& msg);
+    void writeMessage(const std::string &msg);
 
-    static constexpr auto read_interval = 200000;
+    //instance of promise/future pair that is used for messaging
+    PromiseAndFuture<const std::vector<std::string> &> m_PF;
+    static constexpr auto read_interval = 10000;
     std::mutex m_mutex;
-    std::thread *work_thread;
+    std::thread *read_thread;
+    std::thread *write_thread;
     JavaVM *g_vm;
     jobject *jcallback;
     JNIEnv *env;

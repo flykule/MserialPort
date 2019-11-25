@@ -7,7 +7,6 @@
 
 #include <SerialPort.hpp>
 #include "IWorker.h"
-#include <PFBackgroundService.h>
 
 using namespace mn::CppLinuxSerial;
 
