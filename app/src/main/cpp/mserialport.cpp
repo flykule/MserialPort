@@ -3,6 +3,7 @@
 #include <androidLog.h>
 #include <random>
 #include <SPWriteWorker.h>
+#include <unistd.h>
 
 static SerialPortManager *mManager;
 static JavaVM *g_vm;
@@ -54,7 +55,7 @@ Java_com_castle_serialport_SerialPortManager_openWriteSerialPort(
     const char *path_utf = env->GetStringUTFChars(path, nullptr);
     std::string name = std::string(path_utf);
     mManager->addSerialPort(path_utf, SerialPortManager::FLAG_WRITE,
-                            new SPWriteWorker(name.c_str(), &baudRate));
+                            std::make_unique<SPWriteWorker>(name.c_str(), &baudRate));
     env->ReleaseStringUTFChars(path, path_utf);
     LOGD("打开写串口成功");
 }
@@ -72,6 +73,12 @@ jint JNI_OnLoad(JavaVM *jvm, void *reserved) {
     return JNI_VERSION_1_4;
 }
 
+static jbyteArray StringToJByteArray(JNIEnv *env, const std::string &nativeString) {
+    jbyteArray arr = env->NewByteArray(nativeString.length());
+    env->SetByteArrayRegion(arr, 0, nativeString.length(), (jbyte *) nativeString.c_str());
+    return arr;
+}
+
 extern "C" JNIEXPORT void JNICALL
 Java_com_castle_serialport_SerialPortManager_openReadSerialPort(
         JNIEnv *env,
@@ -84,7 +91,8 @@ Java_com_castle_serialport_SerialPortManager_openReadSerialPort(
     auto name = std::string(path_utf);
     g_callback_map[path_utf] = env->NewGlobalRef(callback);
     mManager->addSerialPort(path_utf, SerialPortManager::FLAG_READ,
-                            new SPReadWorker(name.c_str(), &baudRate, g_vm, &g_callback_map[name]));
+                            std::make_unique<SPReadWorker>(name.c_str(), &baudRate, g_vm,
+                                                           &g_callback_map[name]));
     mManager->sendMessage(name, {start}, SerialPortManager::FLAG_READ);
     env->ReleaseStringUTFChars(path, path_utf);
 }

@@ -1,11 +1,16 @@
 package com.example.mserialport
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.castle.serialport.SerialPortManager
 import kotlinx.android.synthetic.main.activity_main.*
 import java.util.*
 import kotlin.concurrent.fixedRateTimer
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -61,6 +66,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         initListener()
         initListener_2()
+        checkPermissions()
         // Example of a call to a native method
     }
 
@@ -183,5 +189,46 @@ class MainActivity : AppCompatActivity() {
             0,
             2
         ) + position.substring(2, 4) + contentGBK
+    }
+    var permissions = arrayOf<String>(
+        Manifest.permission.INTERNET,
+        Manifest.permission.READ_PHONE_STATE,
+        Manifest.permission.READ_EXTERNAL_STORAGE,
+        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+        Manifest.permission.VIBRATE,
+        Manifest.permission.RECORD_AUDIO
+    )
+    private fun checkPermissions(): Boolean {
+        var result: Int
+        val listPermissionsNeeded: MutableList<String> = ArrayList()
+        for (p in permissions) {
+            result = ContextCompat.checkSelfPermission(this, p)
+            if (result != PackageManager.PERMISSION_GRANTED) {
+                listPermissionsNeeded.add(p)
+            }
+        }
+        if (!listPermissionsNeeded.isEmpty()) {
+            ActivityCompat.requestPermissions(
+                this,
+                listPermissionsNeeded.toTypedArray(),
+                100
+            )
+            return false
+        }
+        return true
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        if (requestCode == 100) {
+            if (grantResults.size > 0
+                && grantResults[0] == PackageManager.PERMISSION_GRANTED
+            ) { // do something
+            }
+            return
+        }
     }
 }
