@@ -8,6 +8,7 @@
 #include "../includes/IWorker.h"
 #include "SerialPort.hpp"
 #include <unistd.h>
+#include <queue>
 
 using namespace mn::CppLinuxSerial;
 static constexpr auto START_READ = "start_read";
@@ -68,14 +69,17 @@ class SPReadWriteWorker : public IWorker {
 
 
 private:
-    void writeMessage(const std::string &msg);
+    void writeMessage(const std::vector<std::string>& messages);
 
     //instance of promise/future pair that is used for messaging
     PromiseAndFuture<const std::vector<std::string> &> m_PF;
     static constexpr auto read_interval = 15000;
+    static constexpr auto write_interval = 5000;
     std::mutex m_mutex;
     std::thread *read_thread;
+    bool isSending;
     std::thread *write_thread;
+    std::queue<std::vector<std::string>> mMessages;
     JavaVM *g_vm;
     jobject *jcallback;
     JNIEnv *env;
@@ -84,6 +88,7 @@ public:
     SPReadWriteWorker(std::string &name, const int &baudrate, JavaVM *vm, jobject *callback);
 
     virtual ~SPReadWriteWorker();
+
     void doWork(const std::vector<std::string> &msgs) override;
 };
 

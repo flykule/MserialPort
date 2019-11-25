@@ -43,11 +43,8 @@ void SPReadWriteWorker::doWork(const std::vector<std::string> &msgs) {
     if (msgs[0] == START_READ) {
         read_thread = new std::thread(&SPReadWriteWorker::readLoop, this);
     } else {
-        bool success = false;
-        while (!success) {
-            success = m_PF.set(msgs);
-            usleep(read_interval);
-        }
+        const std::lock_guard<std::mutex> lock(m_mutex);
+        mMessages.push(msgs);
     }
 }
 
@@ -116,23 +113,25 @@ SPReadWriteWorker::~SPReadWriteWorker() {
 
 }
 
-void SPReadWriteWorker::writeMessage(const std::string &msg) {
-    int len = msg.length() / 2;
-    char temp[len];
-    HexToBytes(msg, temp);
-    _serialPort->Write(temp, len);
+void SPReadWriteWorker::writeMessage(const std::vector<std::string> &messages) {
+    for (auto &&c:messages) {
+        int len = c.length() / 2;
+        char temp[len];
+        HexToBytes(c, temp);
+        _serialPort->Write(temp, len);
+    }
 }
 
 void SPReadWriteWorker::writeLoop() {
     while (!stopRequested()) {
-        if (m_PF.ready()) {
-            auto commands = m_PF.get();
-            for (auto &&c:commands) {
-                LOGD("处理消息%s", c.c_str());
-                writeMessage(c);
-            }
+        if (!mMessages.empty()) {
+            m_mutex.lock();
+            auto commands = mMessages.front();
+            writeMessage(commands);
+            mMessages.pop();
+            m_mutex.unlock();
         }
-        usleep(read_interval);
+        usleep(write_interval);
     }
 }
 

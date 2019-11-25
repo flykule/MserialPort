@@ -335,7 +335,7 @@ namespace mn {
             }
 
             int writeResult = write(fileDesc_, bytes, static_cast<size_t>(len));
-            tcdrain(fileDesc_);
+//            tcdrain(fileDesc_);
 
             // Check status
             if (writeResult == -1) {
