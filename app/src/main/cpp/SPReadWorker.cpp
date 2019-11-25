@@ -74,7 +74,6 @@ void SPReadWorker::readLoop() {
     while (!stopRequested()) {
         ioctl(_serialPort->getFileDescriptor(), FIONREAD, &byte_read);
         if (byte_read <= 0) {
-            LOGD("没消息,睡觉");
             usleep(read_interval);
             continue;
         }

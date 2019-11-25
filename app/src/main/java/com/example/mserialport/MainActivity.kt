@@ -24,14 +24,14 @@ class MainActivity : AppCompatActivity() {
     val SERIAL_PORT_NAME_CARDCODE_SCAN = "/dev/ttysWK1"//读卡器串口名
     val SERIAL_PORT_CARDCODE_SCAN = 57600//读卡器波特率
 
-    val mSerialPortManager by lazy {
-        SerialPortManager.apply {
-            openWriteSerialPort(
-                mScreenPath,
-                9600
-            )
-        }
-    }
+//    val mSerialPortManager by lazy {
+//        SerialPortManager.apply {
+//            openWriteSerialPort(
+//                mScreenPath,
+//                9600
+//            )
+//        }
+//    }
 
     val PAGE_STATUS_INITING = "01" //初始化界面
     val PAGE_STATUS_STANDBY = "04" //待机界面
@@ -66,9 +66,9 @@ class MainActivity : AppCompatActivity() {
 
     private fun initListener_2() {
         read_qr_scanner.setOnClickListener {
-            mSerialPortManager.openReadSerialPort(
+            SerialPortManager.openReadSerialPort(
                 SERIAL_PORT_NAME_QRCODE_SCAN,
-                SERIAL_PORT_QRCODE_SCAN,
+                2400,
                 object : SerialPortManager.OnReadListener {
                     override fun onDataReceived(msg: ByteArray) {
                         println("接受到扫码头消息${HexUtils.bytesToHexString(msg)}")
@@ -76,7 +76,7 @@ class MainActivity : AppCompatActivity() {
                 })
         }
         start_listen_screen_2.setOnClickListener {
-            mSerialPortManager.openWriteSerialPort(
+            SerialPortManager.openWriteSerialPort(
                 SEARIAL_PORT_NAME_SCREEN_2,
                 SERIAL_PORT_KEYBROAD
             )
@@ -86,7 +86,7 @@ class MainActivity : AppCompatActivity() {
                 val millis = System.currentTimeMillis()
                 val version = Random(millis).nextInt(2000)
                 val pageCmd = pageCmd("2900", "${version}${version}")
-                mSerialPortManager.sendMessage(
+                SerialPortManager.sendMessage(
                     mScreenPath,
                     arrayOf(dateCommand, pageCmd),
                     SerialPortManager.FLAG_WRITE
@@ -94,19 +94,19 @@ class MainActivity : AppCompatActivity() {
             }
         }
         end_listen_screen_2.setOnClickListener {
-            mSerialPortManager.closeSerialPort(SEARIAL_PORT_NAME_SCREEN_2)
+            SerialPortManager.closeSerialPort(SEARIAL_PORT_NAME_SCREEN_2)
         }
         close_all_sp.setOnClickListener {
-            mSerialPortManager.closeSerialPort(mScreenPath)
-            mSerialPortManager.closeSerialPort(SERIAL_PORT_NAME_KEYBROAD)
-            mSerialPortManager.closeSerialPort(SERIAL_PORT_NAME_QRCODE_SCAN)
-            mSerialPortManager.closeSerialPort(SEARIAL_PORT_NAME_SCREEN_2)
+            SerialPortManager.closeSerialPort(mScreenPath)
+            SerialPortManager.closeSerialPort(SERIAL_PORT_NAME_KEYBROAD)
+            SerialPortManager.closeSerialPort(SERIAL_PORT_NAME_QRCODE_SCAN)
+            SerialPortManager.closeSerialPort(SEARIAL_PORT_NAME_SCREEN_2)
         }
     }
 
     private fun initListener() {
         update_time.setOnClickListener {
-            mSerialPortManager.sendMessage(
+            SerialPortManager.sendMessage(
                 mScreenPath,
                 arrayOf(dateCommand),
                 SerialPortManager.FLAG_WRITE
@@ -116,14 +116,14 @@ class MainActivity : AppCompatActivity() {
         update_version.setOnClickListener {
             val millis = System.currentTimeMillis()
             val version = Random(millis).nextInt(2000)
-            mSerialPortManager.sendMessage(
+            SerialPortManager.sendMessage(
                 mScreenPath,
                 arrayOf(pageCmd("2900", "${version}${version}")),
                 2
             );
         }
         start_listen_kb.setOnClickListener {
-            mSerialPortManager.openReadSerialPort(
+            SerialPortManager.openReadSerialPort(
                 SERIAL_PORT_NAME_KEYBROAD,
                 9600,
                 object : SerialPortManager.OnReadListener {
@@ -131,11 +131,11 @@ class MainActivity : AppCompatActivity() {
                         println("接受到键盘消息${HexUtils.bytesToHexString(msg)}")
                     }
                 });
-            mSerialPortManager.openWriteSerialPort(SERIAL_PORT_NAME_KEYBROAD,9600)
-            mSerialPortManager.sendMessage(SERIAL_PORT_NAME_KEYBROAD, arrayOf("0000"))
+            SerialPortManager.openWriteSerialPort(SERIAL_PORT_NAME_KEYBROAD,9600)
+            SerialPortManager.sendMessage(SERIAL_PORT_NAME_KEYBROAD, arrayOf("0000"))
         }
         end_listen_kb.setOnClickListener {
-            mSerialPortManager.closeSerialPort(SERIAL_PORT_NAME_KEYBROAD);
+            SerialPortManager.closeSerialPort(SERIAL_PORT_NAME_KEYBROAD);
         }
     }
 

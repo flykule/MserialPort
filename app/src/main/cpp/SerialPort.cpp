@@ -78,7 +78,7 @@ namespace mn {
             // O_RDONLY for read-only, O_WRONLY for write only, O_RDWR for both read/write access
             // 3rd, optional parameter is mode_t mode
 //            fileDesc_ = open(device_.c_str(), O_RDWR | O_NONBLOCK | O_CLOEXEC);
-            fileDesc_ = open(device_.c_str(), O_RDWR | O_NONBLOCK | O_NOCTTY | O_CLOEXEC);
+            fileDesc_ = open(device_.c_str(), O_RDWR |  O_NOCTTY );
 
             // Check status
             if (fileDesc_ == -1) {
@@ -86,15 +86,15 @@ namespace mn {
                              ". Is the device name correct and do you have read/write permission?");
             }
 
-//            ConfigureTermios();
+            ConfigureTermios();
 
-            struct termios cfg;
-            tcgetattr(fileDesc_, &cfg);
+//            struct termios cfg;
+//            tcgetattr(fileDesc_, &cfg);
 
-            cfmakeraw(&cfg);
-            cfsetispeed(&cfg, getBaudrate(custom_baudRate));
-            cfsetospeed(&cfg, getBaudrate(custom_baudRate));
-            this->SetTermios(cfg);
+//            cfmakeraw(&cfg);
+//            cfsetispeed(&cfg, getBaudrate(custom_baudRate));
+//            cfsetospeed(&cfg, getBaudrate(custom_baudRate));
+//            this->SetTermios(cfg);
 
 //            std::cout << "COM port opened successfully." << std::endl;
             state_ = State::OPEN;
@@ -111,6 +111,10 @@ namespace mn {
             //================== CONFIGURE ==================//
 
             termios tty = GetTermios();
+            speed_t speed;
+
+            LOGD("input speed: %lu", (unsigned long) cfgetispeed(&tty));
+            LOGD("output speed: %lu", (unsigned long) cfgetospeed(&tty));
 
             //================= (.c_cflag) ===============//
 
@@ -171,11 +175,11 @@ namespace mn {
             // Canonical input is when read waits for EOL or EOF characters before returning. In non-canonical mode, the rate at which
             // read() returns is instead controlled by c_cc[VMIN] and c_cc[VTIME]
 //            tty.c_lflag &= ~ICANON;                                // Turn off canonical input, which is suitable for pass-through
-//            echo_ ? (tty.c_lflag | ECHO) : (tty.c_lflag &
-//                                            ~(ECHO));    // Configure echo depending on echo_ boolean
-//            tty.c_lflag &= ~ECHOE;                                // Turn off echo erase (echo erase only relevant if canonical input is active)
-//            tty.c_lflag &= ~ECHONL;                                //
-//            tty.c_lflag &= ~ISIG;                                // Disables recognition of INTR (interrupt), QUIT and SUSP (suspend) characters
+            echo_ ? (tty.c_lflag | ECHO) : (tty.c_lflag &
+                                            ~(ECHO));    // Configure echo depending on echo_ boolean
+            tty.c_lflag &= ~ECHOE;                                // Turn off echo erase (echo erase only relevant if canonical input is active)
+            tty.c_lflag &= ~ECHONL;                                //
+            tty.c_lflag &= ~ISIG;                                // Disables recognition of INTR (interrupt), QUIT and SUSP (suspend) characters
 
 
 
