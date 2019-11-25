@@ -1,9 +1,8 @@
 //
-// Created by Administrator on 2019/11/18.
+// Created by Administrator on 2019/11/25.
 //
 
-#include <unistd.h>
-#include "includes/SPReadWorker.h"
+#include "include/SPReadWriteWorker.h"
 
 static jbyteArray StringToJByteArray(JNIEnv *env, const std::string &nativeString) {
     jbyteArray arr = env->NewByteArray(nativeString.length());
@@ -11,42 +10,46 @@ static jbyteArray StringToJByteArray(JNIEnv *env, const std::string &nativeStrin
     return arr;
 }
 
-void SPReadWorker::doWork(const std::vector<std::string>& msgs) {
-    work_thread = new std::thread(&SPReadWorker::readLoop, this);
+const int BIT16 = 16;
+
+static void HexToBytes(const std::string &hex, char *result) {
+    for (unsigned int i = 0; i < hex.length(); i += 2) {
+        std::string byteString = hex.substr(i, 2);
+        char byte = (char) strtol(byteString.c_str(), nullptr, BIT16);
+        *result = byte;
+        result++;
+    }
 }
 
-SPReadWorker::~SPReadWorker() {
-    LOGD("开始销毁SPReadWorker,是否已经被中止%d", stopRequested() ? 1 : 0);
-    if (work_thread->joinable()) {
-        work_thread->join();
-    }
-    work_thread = nullptr;
-    _serialPort->Close();
-    _serialPort = nullptr;
-    g_vm = nullptr;
-//    释放你的全局引用的接口，生命周期自己把控
-    jcallback = nullptr;
-    env = nullptr;
-};
-
-SPReadWorker::SPReadWorker(const char *c_name, const int *baudrate, JavaVM *vm,
-                           jobject *callback) :
+SPReadWriteWorker::SPReadWriteWorker(std::string &name, const int &baudrate, JavaVM *vm,
+                                     jobject *callback) :
         jcallback(callback),
         work_thread(nullptr),
         g_vm(vm),
         env(nullptr) {
-    _serialPort = new SerialPort(c_name, *baudrate);
-    //non-blocking read
-    _serialPort->SetTimeout(-1);
+    _serialPort = new SerialPort(name, baudrate);
+    _serialPort->SetTimeout(0);
     _serialPort->Open();
     if (_serialPort->currendState() == State::OPEN) {
-        LOGD("打开读串口%s成功", c_name);
+        LOGD("打开读串口%s成功", name.c_str());
     } else {
-        LOGD("打开读串口%s失败", c_name);
+        LOGD("打开读串口%s失败", name.c_str());
+    }
+
+}
+
+void SPReadWriteWorker::doWork(const std::vector<std::string> &msgs) {
+    if (msgs[0] == "start") {
+        work_thread = new std::thread(&SPReadWriteWorker::readLoop, this);
+    } else {
+        std::lock_guard<std::mutex> lockGuard(m_mutex);
+        for (auto m:msgs) {
+            writeMessage(m);
+        }
     }
 }
 
-void SPReadWorker::readLoop() {
+void SPReadWriteWorker::readLoop() {
     int getEnvStat = g_vm->GetEnv(reinterpret_cast<void **>(&env), JNI_VERSION_1_6);
     if (getEnvStat == JNI_EDETACHED) {
         //如果没有， 主动附加到jvm环境中，获取到env
@@ -92,3 +95,15 @@ void SPReadWorker::readLoop() {
     if (g_vm)
         g_vm->DetachCurrentThread();
 }
+
+SPReadWriteWorker::~SPReadWriteWorker() {
+
+}
+
+void SPReadWriteWorker::writeMessage(const std::string &msg) {
+    int len = msg.length() / 2;
+    char temp[len];
+    HexToBytes(msg, temp);
+    _serialPort->Write(temp, len);
+}
+

@@ -18,7 +18,7 @@ public:
 
     virtual ~SPReadWorker();
 
-    void doWork(const std::vector<std::string> msgs);
+    void doWork(const std::vector<std::string>& msgs) override ;
 
     void readLoop();
 

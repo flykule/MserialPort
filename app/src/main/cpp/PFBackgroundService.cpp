@@ -1,6 +1,6 @@
 #include <PFBackgroundService.h>
 
-void PFBackgroundService::processMessage(const std::vector<std::string> msgs) {
+void PFBackgroundService::processMessage(const std::vector<std::string>& msgs) {
     bool success = false;
     while (!success) {
         success = m_PF.set(msgs);

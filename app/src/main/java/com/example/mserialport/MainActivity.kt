@@ -20,7 +20,7 @@ class MainActivity : AppCompatActivity() {
     val SERIAL_PORT_QRCODE_SCAN = 2400//二维码扫码器波特率
 
     val SEARIAL_PORT_NAME_SCREEN_2 = "/dev/ttyHSL0"//屏幕2串口
-    val SERIAL_PORT_SCREEN_2 = 2400//屏幕串口的波特率
+    val SERIAL_PORT_SCREEN_2 = 9600//屏幕串口的波特率
     val SERIAL_PORT_NAME_CARDCODE_SCAN = "/dev/ttysWK1"//读卡器串口名
     val SERIAL_PORT_CARDCODE_SCAN = 57600//读卡器波特率
 

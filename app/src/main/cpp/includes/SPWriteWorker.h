@@ -14,7 +14,7 @@ using namespace mn::CppLinuxSerial;
 class SPWriteWorker : public IWorker {
 public:
     SPWriteWorker(const char *c_name,const int* baudrate);
-    void doWork(const std::vector<std::string> msgs);
+    void doWork(const std::vector<std::string>& msgs) override ;
     virtual ~SPWriteWorker();
 private:
     void internalWork(std::string& msg);

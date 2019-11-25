@@ -66,14 +66,14 @@ private:
     std::unique_ptr<std::thread> m_thread;
 
     //instance of promise/future pair that is used for messaging
-    PromiseAndFuture<const std::vector<std::string>> m_PF;
+    PromiseAndFuture<const std::vector<std::string>&> m_PF;
     IWorker *_worker;
 
 public:
     //stop message
     static constexpr auto STOP = "stop";
 
-    void processMessage(const std::vector<std::string> msgs);
+    void processMessage(const std::vector<std::string>& msgs) override ;
 
     //destructor (stops and waits for managed thread to exit)
     ~PFBackgroundService();

@@ -30,7 +30,7 @@ SPWriteWorker::~SPWriteWorker() {
     _serialPort = nullptr;
 };
 
-void SPWriteWorker::doWork(const std::vector<std::string> msgs) {
+void SPWriteWorker::doWork(const std::vector<std::string>& msgs) {
     std::lock_guard<std::mutex> lockGuard(m_mutex);
     for (auto m:msgs) {
         internalWork(m);

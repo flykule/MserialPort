@@ -15,7 +15,7 @@ class IWorker {
 public:
     IWorker() : futureObj(exitSignal.get_future()) {}
 
-    virtual void doWork(const std::vector<std::string> msgs) = 0;
+    virtual void doWork(const std::vector<std::string>& msgs) = 0;
 
     virtual ~IWorker() {}
 
