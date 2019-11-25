@@ -73,6 +73,10 @@ Java_com_castle_serialport_SerialPortManager_openSerialPort(
         jobject callback
 ) {
     const char *path_utf = env->GetStringUTFChars(path, nullptr);
+    if (mManager->hasSerialPort(path_utf)) {
+        LOGE("请不要重复添加串口,路径%s", path_utf);
+        return;
+    }
     auto name = std::string(path_utf);
     if (callback != nullptr) {
         g_callback_map[path_utf] = env->NewGlobalRef(callback);
