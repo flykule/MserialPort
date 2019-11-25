@@ -72,7 +72,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun initListener_2() {
         read_qr_scanner.setOnClickListener {
-            SerialPortManager.openReadSerialPort(
+            SerialPortManager.openSerialPort(
                 SERIAL_PORT_NAME_QRCODE_SCAN,
                 2400,
                 object : SerialPortManager.OnReadListener {
@@ -82,12 +82,14 @@ class MainActivity : AppCompatActivity() {
                 })
         }
         start_listen_screen_2.setOnClickListener {
-            SerialPortManager.openWriteSerialPort(
+            SerialPortManager.openSerialPort(
                 SEARIAL_PORT_NAME_SCREEN_2,
                 SERIAL_PORT_KEYBROAD
             )
         }
         crazy_test.setOnClickListener {
+            SerialPortManager.openSerialPort(mScreenPath, SERIAL_PORT_SCREEN_2)
+//            SerialPortManager.sendMessage(mScreenPath, arrayOf())
             fixedRateTimer("Trump", true, 5 * 1000, 5) {
                 val millis = System.currentTimeMillis()
                 val version = Random(millis).nextInt(2000)
@@ -112,15 +114,17 @@ class MainActivity : AppCompatActivity() {
 
     private fun initListener() {
         update_time.setOnClickListener {
+            SerialPortManager.openSerialPort(mScreenPath, SERIAL_PORT_SCREEN_2)
             SerialPortManager.sendMessage(
                 mScreenPath,
                 arrayOf(dateCommand),
                 SerialPortManager.FLAG_WRITE
             )
+            SerialPortManager.closeSerialPort(mScreenPath)
         }
 
         update_version.setOnClickListener {
-            SerialPortManager.openWriteSerialPort(mScreenPath, SERIAL_PORT_SCREEN_2)
+            SerialPortManager.openSerialPort(mScreenPath, SERIAL_PORT_SCREEN_2)
             val millis = System.currentTimeMillis()
             val version = Random(millis).nextInt(2000)
             SerialPortManager.sendMessage(
@@ -131,7 +135,7 @@ class MainActivity : AppCompatActivity() {
             SerialPortManager.closeSerialPort(mScreenPath)
         }
         start_listen_kb.setOnClickListener {
-            SerialPortManager.openReadSerialPort(
+            SerialPortManager.openSerialPort(
                 SERIAL_PORT_NAME_KEYBROAD,
                 SERIAL_PORT_KEYBROAD,
                 object : SerialPortManager.OnReadListener {
@@ -139,7 +143,6 @@ class MainActivity : AppCompatActivity() {
                         println("接受到键盘消息${HexUtils.bytesToHexString(msg)}")
                     }
                 });
-            SerialPortManager.openWriteSerialPort(SERIAL_PORT_NAME_KEYBROAD, 9600)
             SerialPortManager.sendMessage(SERIAL_PORT_NAME_KEYBROAD, arrayOf("0000"))
         }
         end_listen_kb.setOnClickListener {
@@ -190,6 +193,7 @@ class MainActivity : AppCompatActivity() {
             2
         ) + position.substring(2, 4) + contentGBK
     }
+
     var permissions = arrayOf<String>(
         Manifest.permission.INTERNET,
         Manifest.permission.READ_PHONE_STATE,
@@ -198,6 +202,7 @@ class MainActivity : AppCompatActivity() {
         Manifest.permission.VIBRATE,
         Manifest.permission.RECORD_AUDIO
     )
+
     private fun checkPermissions(): Boolean {
         var result: Int
         val listPermissionsNeeded: MutableList<String> = ArrayList()

@@ -2,7 +2,7 @@
 // Created by Administrator on 2019/11/25.
 //
 
-#include "include/SPReadWriteWorker.h"
+#include "includes/SPReadWriteWorker.h"
 
 static jbyteArray StringToJByteArray(JNIEnv *env, const std::string &nativeString) {
     jbyteArray arr = env->NewByteArray(nativeString.length());
@@ -31,9 +31,9 @@ SPReadWriteWorker::SPReadWriteWorker(std::string &name, const int &baudrate, Jav
     _serialPort->SetTimeout(0);
     _serialPort->Open();
     if (_serialPort->currendState() == State::OPEN) {
-        LOGD("打开读串口%s成功", name.c_str());
+        LOGD("打开串口%s成功", name.c_str());
     } else {
-        LOGD("打开读串口%s失败", name.c_str());
+        LOGD("打开串口%s失败", name.c_str());
     }
     write_thread = new std::thread(&SPReadWriteWorker::writeLoop, this);
 
@@ -46,7 +46,7 @@ void SPReadWriteWorker::doWork(const std::vector<std::string> &msgs) {
         bool success = false;
         while (!success) {
             success = m_PF.set(msgs);
-            usleep(500);
+            usleep(read_interval);
         }
     }
 }
@@ -99,6 +99,20 @@ void SPReadWriteWorker::readLoop() {
 }
 
 SPReadWriteWorker::~SPReadWriteWorker() {
+    LOGD("开始销毁SPReadWriteWorker");
+    stop();
+    usleep(read_interval + 5000);
+    if (write_thread != nullptr && write_thread->joinable())
+        write_thread->join();
+    if (read_thread != nullptr && read_thread->joinable())
+        read_thread->join();
+    write_thread = nullptr;
+    read_thread = nullptr;
+    _serialPort->Close();
+    _serialPort = nullptr;
+    g_vm = nullptr;
+    jcallback = nullptr;
+    env = nullptr;
 
 }
 
@@ -117,6 +131,7 @@ void SPReadWriteWorker::writeLoop() {
                 writeMessage(c);
             }
         }
+        usleep(read_interval);
     }
 }
 

@@ -1,8 +1,8 @@
 #include <jni.h>
 #include <SerialPortManager.h>
 #include <androidLog.h>
+#include <SPReadWriteWorker.h>
 #include <random>
-#include <SPWriteWorker.h>
 #include <unistd.h>
 
 static SerialPortManager *mManager;
@@ -28,7 +28,7 @@ Java_com_castle_serialport_SerialPortManager_sendMessage(
         env->ReleaseStringUTFChars(message, msg_utf);
     }
     auto name = std::string(path_utf);
-    mManager->sendMessage(name, msgs, SerialPortManager::FLAG_WRITE);
+    mManager->sendMessage(name, msgs);
     env->ReleaseStringUTFChars(path, path_utf);
 }
 
@@ -40,24 +40,9 @@ Java_com_castle_serialport_SerialPortManager_closeSerialPort(
 ) {
     const char *path_utf = env->GetStringUTFChars(path, nullptr);
     auto name = std::string(path_utf);
-    mManager->removeSerialPort(name, SerialPortManager::FLAG_WRITE | SerialPortManager::FLAG_READ);
+    mManager->removeSerialPort(name);
     g_callback_map.erase(path_utf);
     env->ReleaseStringUTFChars(path, path_utf);
-}
-
-extern "C" JNIEXPORT void JNICALL
-Java_com_castle_serialport_SerialPortManager_openWriteSerialPort(
-        JNIEnv *env,
-        jobject thiz,
-        jstring path,
-        jint baudRate
-) {
-    const char *path_utf = env->GetStringUTFChars(path, nullptr);
-    std::string name = std::string(path_utf);
-    mManager->addSerialPort(path_utf, SerialPortManager::FLAG_WRITE,
-                            std::make_unique<SPWriteWorker>(name.c_str(), &baudRate));
-    env->ReleaseStringUTFChars(path, path_utf);
-    LOGD("打开写串口成功");
 }
 
 
@@ -80,7 +65,7 @@ static jbyteArray StringToJByteArray(JNIEnv *env, const std::string &nativeStrin
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_com_castle_serialport_SerialPortManager_openReadSerialPort(
+Java_com_castle_serialport_SerialPortManager_openSerialPort(
         JNIEnv *env,
         jobject thiz,
         jstring path,
@@ -89,10 +74,17 @@ Java_com_castle_serialport_SerialPortManager_openReadSerialPort(
 ) {
     const char *path_utf = env->GetStringUTFChars(path, nullptr);
     auto name = std::string(path_utf);
-    g_callback_map[path_utf] = env->NewGlobalRef(callback);
-    mManager->addSerialPort(path_utf, SerialPortManager::FLAG_READ,
-                            std::make_unique<SPReadWorker>(name.c_str(), &baudRate, g_vm,
-                                                           &g_callback_map[name]));
-    mManager->sendMessage(name, {start}, SerialPortManager::FLAG_READ);
+    if (callback != nullptr) {
+        g_callback_map[path_utf] = env->NewGlobalRef(callback);
+        mManager->addSerialPort(path_utf,
+                                std::make_unique<SPReadWriteWorker>(name, baudRate, g_vm,
+                                                                    &g_callback_map[name]));
+        mManager->sendMessage(name, {START_READ});
+    } else {
+        mManager->addSerialPort(path_utf,
+                                std::make_unique<SPReadWriteWorker>(name, baudRate,
+                                                                    nullptr,
+                                                                    nullptr));
+    }
     env->ReleaseStringUTFChars(path, path_utf);
 }

@@ -6,7 +6,7 @@
 #define MSERIALPORT_SPREADWRITEWORKER_H
 
 #include "../includes/IWorker.h"
-#include <SerialPort.hpp>
+#include "SerialPort.hpp"
 #include <unistd.h>
 
 using namespace mn::CppLinuxSerial;
@@ -62,22 +62,17 @@ class SPReadWriteWorker : public IWorker {
         }
     };
 
-    void doWork(const std::vector<std::string> &msgs) override;
-
-    SPReadWriteWorker(std::string &name, const int &baudrate, JavaVM *vm, jobject *callback);
-
     void readLoop();
 
     void writeLoop();
 
-    virtual ~SPReadWriteWorker();
 
 private:
     void writeMessage(const std::string &msg);
 
     //instance of promise/future pair that is used for messaging
     PromiseAndFuture<const std::vector<std::string> &> m_PF;
-    static constexpr auto read_interval = 10000;
+    static constexpr auto read_interval = 15000;
     std::mutex m_mutex;
     std::thread *read_thread;
     std::thread *write_thread;
@@ -85,6 +80,11 @@ private:
     jobject *jcallback;
     JNIEnv *env;
     SerialPort *_serialPort;
+public:
+    SPReadWriteWorker(std::string &name, const int &baudrate, JavaVM *vm, jobject *callback);
+
+    virtual ~SPReadWriteWorker();
+    void doWork(const std::vector<std::string> &msgs) override;
 };
 
 

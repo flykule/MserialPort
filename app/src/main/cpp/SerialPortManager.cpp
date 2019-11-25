@@ -6,47 +6,30 @@
 
 SerialPortManager::SerialPortManager() = default;
 
-int SerialPortManager::removeSerialPort(std::string path, int flag) {
-    if (flag & FLAG_READ) {
-        if (read_map[path]) {
-            read_map[path].reset(nullptr);
-            read_map.erase(path);
-        }
+int SerialPortManager::removeSerialPort(std::string path) {
+    if (inner_map[path]) {
+        inner_map[path].reset(nullptr);
+        inner_map.erase(path);
+        return 0;
+    } else {
+        return -1;
     }
-    if (flag & FLAG_WRITE) {
-        if (write_map[path]) {
-            write_map[path].reset(nullptr);
-            write_map.erase(path);
-        }
-    }
-    return 0;
-
 }
 
 int
-SerialPortManager::sendMessage(std::string path, const std::vector<std::string>& msg, int flag) {
-
-    if (flag & FLAG_READ) {
-//        LOGD("发送读数据%s到%s", msg.c_str(), path.c_str());
-        if (read_map[path])
-            read_map[path]->
-                    doWork(msg);
+SerialPortManager::sendMessage(std::string path, const std::vector<std::string> &msg) {
+    if (inner_map[path]) {
+        inner_map[path]->
+                doWork(msg);
+        return 0;
+    } else {
+        return -1;
     }
-    if (flag & FLAG_WRITE) {
-//        LOGD("发送写数据%s到%s", msg.c_str(), path.c_str());
-        if (write_map[path])
-            write_map[path]->
-                    doWork(msg);
-    }
-    return 0;
 }
 
 SerialPortManager::~SerialPortManager() {
-    for (auto &r:read_map) {
-        removeSerialPort(r.first, FLAG_READ);
-    }
-    for (auto &r:write_map) {
-        removeSerialPort(r.first, FLAG_WRITE);
+    for (auto &r:inner_map) {
+        removeSerialPort(r.first);
     }
 }
 

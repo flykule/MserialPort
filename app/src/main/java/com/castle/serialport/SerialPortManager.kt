@@ -14,13 +14,6 @@ object SerialPortManager {
         System.loadLibrary("mserialport")
     }
 
-    /**
-     * 打开一个新串口用于写数据
-     * @param path 串口路径,通常为/dev/tty*开头
-     * @param baudrate 波特率 拨特率越高, 发送消息越快
-     * @param 如果成功,那么返回0,否则为失败
-     */
-    external fun openWriteSerialPort(path: String, baudrate: Int)
 
     /**
      * 关闭串口
@@ -41,8 +34,10 @@ object SerialPortManager {
     /**
      * 打开一个读串口,用于监听数据
      * @param path 串口路径,通常为/dev/tty*开头
+     * @param baudrate 串口拨特率,底层在打开串口时会检测一次默认波特率
+     * @param listener 读数据监听,为空的话就为只写接口
      */
-    external fun openReadSerialPort(path: String, baudrate: Int, listener: OnReadListener)
+    external fun openSerialPort(path: String, baudrate: Int, listener: OnReadListener? = null)
 
     interface OnReadListener {
         fun onDataReceived(msg: ByteArray)
