@@ -57,6 +57,7 @@ void SPReadWriteWorker::readLoop() {
         }
     }
     //通过强转后的jcallback 获取到要回调的类
+    //这行会报deleted
     jclass javaClass = env->GetObjectClass(*jcallback);
 
     if (javaClass == 0) {
@@ -85,7 +86,11 @@ void SPReadWriteWorker::readLoop() {
             if (stopRequested()) {
                 break;
             }
-            env->CallVoidMethod(*jcallback, javaCallbackId, StringToJByteArray(env, data));
+            auto jArr = StringToJByteArray(env, data);
+            env->CallVoidMethod(*jcallback, javaCallbackId, jArr);
+            auto jBytePtr = env->GetByteArrayElements(jArr, nullptr);
+            env->ReleaseByteArrayElements(jArr,jBytePtr,0);
+            env->DeleteLocalRef(jArr);
         }
     }
     LOGD("读线程终止运行");
