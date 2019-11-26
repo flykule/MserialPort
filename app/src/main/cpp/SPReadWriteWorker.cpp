@@ -121,11 +121,12 @@ SPReadWriteWorker::~SPReadWriteWorker() {
 void SPReadWriteWorker::writeMessage(const std::vector<std::string> &messages) {
     for (auto &&c:messages) {
         int len = c.length() / 2;
-        char temp[len];
+        auto temp = new char[len];
         HexToBytes(c, temp);
         if (stopRequested()) {
             return;
         }
+        delete[]temp;
         _serialPort->Write(temp, len);
     }
 }
