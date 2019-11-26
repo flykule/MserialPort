@@ -87,6 +87,7 @@ void SPReadWorker::readLoop() {
         }
     }
     LOGD("读线程终止运行");
+    env->DeleteLocalRef(javaClass);
     if (jcallback)
         env->DeleteGlobalRef(*jcallback);
     if (g_vm)
