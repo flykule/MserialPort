@@ -88,8 +88,8 @@ void SPReadWriteWorker::readLoop() {
             }
             auto jArr = StringToJByteArray(env, data);
             env->CallVoidMethod(*jcallback, javaCallbackId, jArr);
-            auto jBytePtr = env->GetByteArrayElements(jArr, nullptr);
-            env->ReleaseByteArrayElements(jArr,jBytePtr,0);
+//            auto jBytePtr = env->GetByteArrayElements(jArr, nullptr);
+//            env->ReleaseByteArrayElements(jArr,jBytePtr,0);
             env->DeleteLocalRef(jArr);
         }
     }
