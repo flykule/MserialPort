@@ -26,6 +26,7 @@ Java_com_castle_serialport_SerialPortManager_sendMessage(
         const char *msg_utf = env->GetStringUTFChars(message, nullptr);
         msgs.emplace_back(std::string(msg_utf));
         env->ReleaseStringUTFChars(message, msg_utf);
+        env->DeleteLocalRef(message);
     }
     auto name = std::string(path_utf);
     mManager->sendMessage(name, msgs);
