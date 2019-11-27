@@ -34,7 +34,7 @@ SerialPortManager::~SerialPortManager() {
 }
 
 bool SerialPortManager::hasSerialPort(std::string path) {
-    return inner_map.find(path) != inner_map.end();
+    return inner_map[path] != nullptr;
 }
 
 
