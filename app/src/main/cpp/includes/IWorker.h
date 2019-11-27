@@ -20,7 +20,7 @@ public:
     virtual ~IWorker() {}
 
     // Request the thread to stop by setting value in promise object
-    void stop() {
+    virtual void stop() {
         exitSignal.set_value();
     }
 

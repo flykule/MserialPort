@@ -65,15 +65,20 @@ class SPReadWriteWorker : public IWorker {
 
     void readLoop();
 
+    void stop() override {
+        IWorker::stop();
+        cv.notify_all();
+    }
+
     void writeLoop();
 
 
 private:
-    void writeMessage(const std::vector<std::string>& messages);
+    void writeMessage(const std::vector<std::string> &messages);
 
     //instance of promise/future pair that is used for messaging
     static constexpr auto read_interval = 15000;
-    static constexpr auto write_interval = 2000;
+    static constexpr auto write_interval = 200;
     std::mutex m_mutex;
     std::thread *read_thread;
     std::thread *write_thread;
@@ -82,6 +87,7 @@ private:
     jobject *jcallback;
     JNIEnv *env;
     SerialPort *_serialPort;
+    std::condition_variable cv;
 public:
     SPReadWriteWorker(std::string &name, const int &baudrate, JavaVM *vm, jobject *callback);
 

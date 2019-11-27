@@ -45,6 +45,7 @@ void SPReadWriteWorker::doWork(const std::vector<std::string> &msgs) {
     } else {
         const std::lock_guard<std::mutex> lock(m_mutex);
         mMessages.push(msgs);
+        cv.notify_all();
     }
 }
 
@@ -132,18 +133,29 @@ void SPReadWriteWorker::writeMessage(const std::vector<std::string> &messages) {
 }
 
 void SPReadWriteWorker::writeLoop() {
-    while (!stopRequested()) {
-        m_mutex.lock();
-        if (mMessages.empty()) {
-            usleep(write_interval);
-            m_mutex.unlock();
-            continue;
+    while (true) {
+        std::unique_lock<std::mutex> lk(m_mutex);
+        cv.wait(lk, [&] { return stopRequested() || !mMessages.empty(); });
+        if (stopRequested()) {
+            LOGD("收到停止请求");
+            break;
         }
         auto commands = std::move(mMessages.front());
         writeMessage(commands);
         mMessages.pop();
-        m_mutex.unlock();
     }
+//    while (!stopRequested()) {
+//        m_mutex.lock();
+//        if (mMessages.empty()) {
+//            usleep(write_interval);
+//            m_mutex.unlock();
+//            continue;
+//        }
+//        auto commands = std::move(mMessages.front());
+//        writeMessage(commands);
+//        mMessages.pop();
+//        m_mutex.unlock();
+//    }
     LOGD("写线程终止运行");
 }
 
