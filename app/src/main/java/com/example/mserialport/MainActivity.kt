@@ -94,7 +94,7 @@ class MainActivity : AppCompatActivity() {
                 val millis = System.currentTimeMillis()
                 val version = Random(millis).nextInt(2000)
                 val pageCmd = pageCmd("2900", "${version}${version}")
-                SerialPortManager.sendBytes(
+                SerialPortManager.sendMessage(
                     mScreenPath,
                     arrayOf(dateCommand, pageCmd),
                     SerialPortManager.FLAG_WRITE
@@ -115,7 +115,7 @@ class MainActivity : AppCompatActivity() {
     private fun initListener() {
         update_time.setOnClickListener {
             SerialPortManager.openSerialPort(mScreenPath, SERIAL_PORT_SCREEN_2)
-            SerialPortManager.sendBytes(
+            SerialPortManager.sendMessage(
                 mScreenPath,
                 arrayOf(pageJump(PageJump("04")), dateCommand),
                 SerialPortManager.FLAG_WRITE
@@ -141,7 +141,7 @@ class MainActivity : AppCompatActivity() {
                         println("接受到键盘消息${HexUtils.bytesToHexString(msg)}")
                     }
                 });
-            SerialPortManager.sendBytes(SERIAL_PORT_NAME_KEYBROAD, arrayOf("0000"))
+            SerialPortManager.sendMessage(SERIAL_PORT_NAME_KEYBROAD, arrayOf("0000"))
         }
         end_listen_kb.setOnClickListener {
             SerialPortManager.closeSerialPort(SERIAL_PORT_NAME_KEYBROAD);
