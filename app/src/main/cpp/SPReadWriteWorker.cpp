@@ -134,10 +134,10 @@ void SPReadWriteWorker::writeMessage(const std::vector<std::string> &messages) {
 void SPReadWriteWorker::writeLoop() {
     while (!stopRequested()) {
         m_mutex.lock();
-        while (mMessages.empty()) {
-            m_mutex.unlock();
+        if (mMessages.empty()) {
             usleep(write_interval);
-            m_mutex.lock();
+            m_mutex.unlock();
+            continue;
         }
         auto commands = std::move(mMessages.front());
         writeMessage(commands);

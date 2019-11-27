@@ -11,7 +11,7 @@ static JavaVM *g_vm;
 static std::unordered_map<std::string, jobject> g_callback_map;
 static constexpr auto start = "start";
 
-char *ConvertJByteaArrayToChars(JNIEnv *env, jbyteArray *bytearray) {
+const char *ConvertJByteaArrayToChars(JNIEnv *env, jbyteArray *bytearray) {
     char *chars = nullptr;
     jbyte *bytes;
     bytes = env->GetByteArrayElements(*bytearray, nullptr);
