@@ -133,11 +133,11 @@ void SPReadWriteWorker::writeMessage(const std::vector<std::string> &messages) {
 }
 
 void SPReadWriteWorker::writeLoop() {
+    std::unique_lock<std::mutex> lk(m_mutex);
     while (true) {
-        std::unique_lock<std::mutex> lk(m_mutex);
         cv.wait(lk, [&] { return stopRequested() || !mMessages.empty(); });
         if (stopRequested()) {
-            LOGD("收到停止请求");
+//            LOGD("收到停止请求");
             break;
         }
         auto commands = std::move(mMessages.front());

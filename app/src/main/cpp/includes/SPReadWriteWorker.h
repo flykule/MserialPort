@@ -66,6 +66,7 @@ class SPReadWriteWorker : public IWorker {
     void readLoop();
 
     void stop() override {
+        const std::lock_guard<std::mutex> lock(m_mutex);
         IWorker::stop();
         cv.notify_all();
     }
@@ -78,7 +79,6 @@ private:
 
     //instance of promise/future pair that is used for messaging
     static constexpr auto read_interval = 15000;
-    static constexpr auto write_interval = 200;
     std::mutex m_mutex;
     std::thread *read_thread;
     std::thread *write_thread;
