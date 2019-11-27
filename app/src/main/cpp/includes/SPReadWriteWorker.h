@@ -72,12 +72,10 @@ private:
     void writeMessage(const std::vector<std::string>& messages);
 
     //instance of promise/future pair that is used for messaging
-    PromiseAndFuture<const std::vector<std::string> &> m_PF;
     static constexpr auto read_interval = 15000;
-    static constexpr auto write_interval = 1000;
+    static constexpr auto write_interval = 2000;
     std::mutex m_mutex;
     std::thread *read_thread;
-    bool isSending;
     std::thread *write_thread;
     std::queue<std::vector<std::string>> mMessages;
     JavaVM *g_vm;
