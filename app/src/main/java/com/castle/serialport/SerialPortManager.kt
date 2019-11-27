@@ -29,7 +29,16 @@ object SerialPortManager {
      * @param flags 标记, 1->只写,2->只读,3->读写
      * @return 如果失败,底层会直接抛出异常
      */
-    external fun sendMessage(path: String, msg: Array<String>, flags: Int = FLAG_WRITE)
+    external fun sendBytes(path: String, msg: Array<String>, flags: Int = FLAG_WRITE)
+
+    /**
+     * 发送消息给指定串口, 底层已经为串口读写专门开启线程,上层可以直接调用,无需切换线程
+     * @param path 串口路径,通常为/dev/tty*开头
+     * @param msg 要发送给串口的消息, 传入byte数组即可
+     * @param flags 标记, 1->只写,2->只读,3->读写
+     * @return 如果失败,底层会直接抛出异常
+     */
+    external fun sendBytes(path: String, msg: Array<ByteArray>, flags: Int = FLAG_WRITE)
 
     /**
      * 打开一个读串口,用于监听数据

@@ -11,6 +11,19 @@ static JavaVM *g_vm;
 static std::unordered_map<std::string, jobject> g_callback_map;
 static constexpr auto start = "start";
 
+char *ConvertJByteaArrayToChars(JNIEnv *env, jbyteArray *bytearray) {
+    char *chars = nullptr;
+    jbyte *bytes;
+    bytes = env->GetByteArrayElements(*bytearray, nullptr);
+    int chars_len = env->GetArrayLength(*bytearray);
+    chars = new char[chars_len + 1];
+    memset(chars, 0, static_cast<size_t>(chars_len + 1));
+    memcpy(chars, bytes, static_cast<size_t>(chars_len));
+    chars[chars_len] = 0;
+    env->ReleaseByteArrayElements(*bytearray, bytes, 0);
+    return chars;
+}
+
 extern "C" JNIEXPORT void JNICALL
 Java_com_castle_serialport_SerialPortManager_sendMessage(
         JNIEnv *env,
@@ -26,6 +39,27 @@ Java_com_castle_serialport_SerialPortManager_sendMessage(
         const char *msg_utf = env->GetStringUTFChars(message, nullptr);
         msgs.emplace_back(std::string(msg_utf));
         env->ReleaseStringUTFChars(message, msg_utf);
+        env->DeleteLocalRef(message);
+    }
+    auto name = std::string(path_utf);
+    mManager->sendMessage(name, msgs);
+    env->ReleaseStringUTFChars(path, path_utf);
+}
+
+extern "C" JNIEXPORT void JNICALL
+Java_com_castle_serialport_SerialPortManager_sendBytes(
+        JNIEnv *env,
+        jobject thiz,
+        jstring path,
+        jobjectArray commands
+) {
+    const char *path_utf = env->GetStringUTFChars(path, nullptr);
+    int stringCount = env->GetArrayLength(commands);
+    std::vector<std::string> msgs;
+    for (int i = 0; i < stringCount; ++i) {
+        auto message = static_cast<jbyteArray >(env->GetObjectArrayElement(commands, i));
+        auto msg = ConvertJByteaArrayToChars(env, &message);
+        msgs.emplace_back(msg);
         env->DeleteLocalRef(message);
     }
     auto name = std::string(path_utf);

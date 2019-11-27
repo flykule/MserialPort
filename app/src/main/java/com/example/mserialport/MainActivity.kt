@@ -94,7 +94,7 @@ class MainActivity : AppCompatActivity() {
                 val millis = System.currentTimeMillis()
                 val version = Random(millis).nextInt(2000)
                 val pageCmd = pageCmd("2900", "${version}${version}")
-                SerialPortManager.sendMessage(
+                SerialPortManager.sendBytes(
                     mScreenPath,
                     arrayOf(dateCommand, pageCmd),
                     SerialPortManager.FLAG_WRITE
@@ -115,9 +115,9 @@ class MainActivity : AppCompatActivity() {
     private fun initListener() {
         update_time.setOnClickListener {
             SerialPortManager.openSerialPort(mScreenPath, SERIAL_PORT_SCREEN_2)
-            SerialPortManager.sendMessage(
+            SerialPortManager.sendBytes(
                 mScreenPath,
-                arrayOf(pageJump(PageJump("04")),dateCommand),
+                arrayOf(pageJump(PageJump("04")), dateCommand),
                 SerialPortManager.FLAG_WRITE
             )
         }
@@ -126,11 +126,11 @@ class MainActivity : AppCompatActivity() {
             SerialPortManager.openSerialPort(mScreenPath, SERIAL_PORT_SCREEN_2)
             val millis = System.currentTimeMillis()
             val version = Random(millis).nextInt(2000)
-            SerialPortManager.sendMessage(
+            val bytes = pageCmd("2900", "${version}${version}").toByteArray()
+            SerialPortManager.sendBytes(
                 mScreenPath,
-                arrayOf(pageCmd("2900", "${version}${version}")),
-                2
-            );
+                arrayOf(bytes)
+            )
         }
         start_listen_kb.setOnClickListener {
             SerialPortManager.openSerialPort(
@@ -141,7 +141,7 @@ class MainActivity : AppCompatActivity() {
                         println("接受到键盘消息${HexUtils.bytesToHexString(msg)}")
                     }
                 });
-            SerialPortManager.sendMessage(SERIAL_PORT_NAME_KEYBROAD, arrayOf("0000"))
+            SerialPortManager.sendBytes(SERIAL_PORT_NAME_KEYBROAD, arrayOf("0000"))
         }
         end_listen_kb.setOnClickListener {
             SerialPortManager.closeSerialPort(SERIAL_PORT_NAME_KEYBROAD);
