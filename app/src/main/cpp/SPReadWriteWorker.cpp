@@ -126,8 +126,8 @@ void SPReadWriteWorker::writeMessage(const std::vector<std::string> &messages) {
         if (stopRequested()) {
             return;
         }
-        delete[]temp;
         _serialPort->Write(temp, len);
+        delete[]temp;
     }
 }
 
@@ -139,7 +139,7 @@ void SPReadWriteWorker::writeLoop() {
             usleep(write_interval);
             m_mutex.lock();
         }
-        auto commands = mMessages.front();
+        auto commands = std::move(mMessages.front());
         writeMessage(commands);
         mMessages.pop();
         m_mutex.unlock();
