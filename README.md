@@ -5,6 +5,12 @@
 * 底层直接进行读写, 不再返回fileDescriptor指针
 * 底层直接管理串口, 添加删除等
 * 目前的线程通讯通过std::future进行, 未来考虑支持socket通信
+## 如何使用
+1. 使用AndroidStuido->Build Apk, 生成debug包
+2. 修改生成的apk后缀为zip
+3. 解压,复制其中的lib文件夹到你的应用
+4. 复制SerialPortManager.kt这个文件,保持一样的包结构到你的src/main/java目录下
+5. 参考dmeo进行使用
 ## 效果展示
 ![demo](https://github.com/flykule/MserialPort/blob/master/gif/demo.gif)
 
