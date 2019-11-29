@@ -9,6 +9,7 @@
 #include "SerialPort.hpp"
 #include <unistd.h>
 #include <queue>
+#include <poll.h>
 
 using namespace mn::CppLinuxSerial;
 static constexpr auto START_READ = "start_read";
@@ -78,7 +79,7 @@ private:
     void writeMessage(const std::vector<std::string> &messages);
 
     //instance of promise/future pair that is used for messaging
-    static constexpr auto read_interval = 15000;
+    static constexpr auto read_interval = 500;
     std::mutex m_mutex;
     std::thread *read_thread;
     std::thread *write_thread;

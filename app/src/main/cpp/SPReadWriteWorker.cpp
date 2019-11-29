@@ -28,7 +28,7 @@ SPReadWriteWorker::SPReadWriteWorker(std::string &name, const int &baudrate, Jav
         g_vm(vm),
         env(nullptr) {
     _serialPort = new SerialPort(name, baudrate);
-    _serialPort->SetTimeout(0);
+//    _serialPort->SetTimeout(0);
     _serialPort->Open();
     if (_serialPort->currendState() == State::OPEN) {
         LOGD("打开串口%s成功", name.c_str());
@@ -73,25 +73,25 @@ void SPReadWriteWorker::readLoop() {
     }
 
     std::string data;
-    int byte_read;
+    struct pollfd fds[1] = {};
+    fds[0].fd = _serialPort->getFileDescriptor();
+    fds[0].events = POLLIN;
+    int ret = 0;
     //开始循环
-    while (!stopRequested()) {
-        ioctl(_serialPort->getFileDescriptor(), FIONREAD, &byte_read);
-        if (byte_read <= 0) {
-            usleep(read_interval);
-            continue;
-        }
-        _serialPort->Read(data);
-        if (!data.empty()) {
-            //执行回调
+    while (true) {
+        ret = poll(fds, 1, read_interval);
+        if (ret > 0) {
+            if (fds[0].revents & POLLIN) {
+                _serialPort->Read(data);
+                //执行回调
+                auto jArr = StringToJByteArray(env, data);
+                env->CallVoidMethod(*jcallback, javaCallbackId, jArr);
+                env->DeleteLocalRef(jArr);
+            }
+        } else {
             if (stopRequested()) {
                 break;
             }
-            auto jArr = StringToJByteArray(env, data);
-            env->CallVoidMethod(*jcallback, javaCallbackId, jArr);
-//            auto jBytePtr = env->GetByteArrayElements(jArr, nullptr);
-//            env->ReleaseByteArrayElements(jArr,jBytePtr,0);
-            env->DeleteLocalRef(jArr);
         }
     }
     LOGD("读线程终止运行");
