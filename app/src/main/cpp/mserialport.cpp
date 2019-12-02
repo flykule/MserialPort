@@ -10,20 +10,6 @@ static JavaVM *g_vm;
 //用于储存读回调
 static std::unordered_map<std::string, jobject> g_callback_map;
 
-const char *ConvertJByteaArrayToChars(JNIEnv *env, jbyteArray *bytearray) {
-    char *chars = nullptr;
-    jbyte *bytes;
-    bytes = env->GetByteArrayElements(*bytearray, nullptr);
-    int chars_len = env->GetArrayLength(*bytearray);
-    LOGD("Char len %d", chars_len);
-    chars = new char[chars_len + 1];
-    memset(chars, 0, static_cast<size_t>(chars_len + 1));
-    memcpy(chars, bytes, static_cast<size_t>(chars_len));
-    chars[chars_len] = 0;
-    env->ReleaseByteArrayElements(*bytearray, bytes, 0);
-    return chars;
-}
-
 std::vector<char> ConvertJByteArrayToVectorOfChars(JNIEnv *env, jbyteArray *bytearray) {
     jbyte *bytes;
     bytes = env->GetByteArrayElements(*bytearray, nullptr);

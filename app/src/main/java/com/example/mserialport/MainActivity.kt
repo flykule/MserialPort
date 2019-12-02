@@ -100,6 +100,12 @@ class MainActivity : AppCompatActivity() {
                     arrayOf(dateCommand, pageCmd),
                     SerialPortManager.FLAG_WRITE
                 )
+                isOffline = !isOffline;
+                if (isOffline) {
+                    SerialPortManager.sendBytes(mScreenPath, arrayOf(offlineCmd))
+                } else {
+                    SerialPortManager.sendBytes(mScreenPath, arrayOf(onlineCmd))
+                }
             }
         }
         end_listen_screen_2.setOnClickListener {
@@ -123,21 +129,25 @@ class MainActivity : AppCompatActivity() {
             )
         }
 
-        update_version.setOnClickListener {
+        test_bytes.setOnClickListener {
+            SerialPortManager.openSerialPort(mScreenPath, SERIAL_PORT_SCREEN_2)
             isOffline = !isOffline;
             if (isOffline) {
                 SerialPortManager.sendBytes(mScreenPath, arrayOf(offlineCmd))
             } else {
                 SerialPortManager.sendBytes(mScreenPath, arrayOf(onlineCmd))
             }
-//            SerialPortManager.openSerialPort(mScreenPath, SERIAL_PORT_SCREEN_2)
-//            val millis = System.currentTimeMillis()
-//            val version = Random(millis).nextInt(2000)
-//            val bytes = pageCmd("2900", "${version}${version}").toByteArray()
-//            SerialPortManager.sendBytes(
-//                mScreenPath,
-//                arrayOf(bytes)
-//            )
+        }
+
+        update_version.setOnClickListener {
+            SerialPortManager.openSerialPort(mScreenPath, SERIAL_PORT_SCREEN_2)
+            val millis = System.currentTimeMillis()
+            val version = Random(millis).nextInt(2000)
+            val bytes = pageCmd("2900", "${version}${version}").toByteArray()
+            SerialPortManager.sendBytes(
+                mScreenPath,
+                arrayOf(bytes)
+            )
         }
         start_listen_kb.setOnClickListener {
             SerialPortManager.openSerialPort(
