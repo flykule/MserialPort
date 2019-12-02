@@ -37,5 +37,15 @@ bool SerialPortManager::hasSerialPort(std::string path) {
     return inner_map[path] != nullptr;
 }
 
+int SerialPortManager::sendBytesMessage(std::string path, const std::vector<char> &msg) {
+    if (inner_map[path]) {
+        inner_map[path]->
+                doWork(msg);
+        return 0;
+    } else {
+        return -1;
+    }
+}
+
 
 

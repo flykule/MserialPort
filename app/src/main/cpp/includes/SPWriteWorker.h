@@ -15,6 +15,7 @@ public:
     SPWriteWorker(const char *c_name,const int* baudrate);
     void doWork(const std::vector<std::string>& msgs) override ;
     virtual ~SPWriteWorker();
+    virtual void doWork(const std::vector<char>& msg) override {};
 private:
     void internalWork(std::string& msg);
     SerialPort* _serialPort;

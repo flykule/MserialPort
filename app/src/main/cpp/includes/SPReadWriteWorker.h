@@ -84,6 +84,7 @@ private:
     std::thread *read_thread;
     std::thread *write_thread;
     std::queue<std::vector<std::string>> mMessages;
+    std::queue<std::vector<char>> mByteMessages;
     JavaVM *g_vm;
     jobject *jcallback;
     JNIEnv *env;
@@ -95,6 +96,8 @@ public:
     virtual ~SPReadWriteWorker();
 
     void doWork(const std::vector<std::string> &msgs) override;
+
+    virtual void doWork(const std::vector<char> &msgs) override;
 };
 
 

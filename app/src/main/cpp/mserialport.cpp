@@ -9,19 +9,28 @@ static SerialPortManager *mManager;
 static JavaVM *g_vm;
 //用于储存读回调
 static std::unordered_map<std::string, jobject> g_callback_map;
-static constexpr auto start = "start";
 
 const char *ConvertJByteaArrayToChars(JNIEnv *env, jbyteArray *bytearray) {
     char *chars = nullptr;
     jbyte *bytes;
     bytes = env->GetByteArrayElements(*bytearray, nullptr);
     int chars_len = env->GetArrayLength(*bytearray);
+    LOGD("Char len %d", chars_len);
     chars = new char[chars_len + 1];
     memset(chars, 0, static_cast<size_t>(chars_len + 1));
     memcpy(chars, bytes, static_cast<size_t>(chars_len));
     chars[chars_len] = 0;
     env->ReleaseByteArrayElements(*bytearray, bytes, 0);
     return chars;
+}
+
+std::vector<char> ConvertJByteArrayToVectorOfChars(JNIEnv *env, jbyteArray *bytearray) {
+    jbyte *bytes;
+    bytes = env->GetByteArrayElements(*bytearray, nullptr);
+    int chars_len = env->GetArrayLength(*bytearray);
+    std::vector<char> result(bytes, bytes + chars_len);
+    env->ReleaseByteArrayElements(*bytearray, bytes, 0);
+    return result;
 }
 
 extern "C" JNIEXPORT void JNICALL
@@ -55,15 +64,13 @@ Java_com_castle_serialport_SerialPortManager_sendBytes(
 ) {
     const char *path_utf = env->GetStringUTFChars(path, nullptr);
     int stringCount = env->GetArrayLength(commands);
-    std::vector<std::string> msgs;
+    auto name = std::string(path_utf);
     for (int i = 0; i < stringCount; ++i) {
         auto message = static_cast<jbyteArray >(env->GetObjectArrayElement(commands, i));
-        auto msg = ConvertJByteaArrayToChars(env, &message);
-        msgs.emplace_back(msg);
+        auto msg = ConvertJByteArrayToVectorOfChars(env, &message);
+        mManager->sendBytesMessage(name, msg);
         env->DeleteLocalRef(message);
     }
-    auto name = std::string(path_utf);
-    mManager->sendMessage(name, msgs);
     env->ReleaseStringUTFChars(path, path_utf);
 }
 

@@ -40,6 +40,7 @@ class MainActivity : AppCompatActivity() {
 
     val PAGE_STATUS_INITING = "01" //初始化界面
     val PAGE_STATUS_STANDBY = "04" //待机界面
+    var isOffline = false;
 
     private fun nowDate(time: Long): String {
         //获取默认选中的日期的年月日星期的值，并赋值
@@ -123,14 +124,20 @@ class MainActivity : AppCompatActivity() {
         }
 
         update_version.setOnClickListener {
-            SerialPortManager.openSerialPort(mScreenPath, SERIAL_PORT_SCREEN_2)
-            val millis = System.currentTimeMillis()
-            val version = Random(millis).nextInt(2000)
-            val bytes = pageCmd("2900", "${version}${version}").toByteArray()
-            SerialPortManager.sendBytes(
-                mScreenPath,
-                arrayOf(bytes)
-            )
+            isOffline = !isOffline;
+            if (isOffline) {
+                SerialPortManager.sendBytes(mScreenPath, arrayOf(offlineCmd))
+            } else {
+                SerialPortManager.sendBytes(mScreenPath, arrayOf(onlineCmd))
+            }
+//            SerialPortManager.openSerialPort(mScreenPath, SERIAL_PORT_SCREEN_2)
+//            val millis = System.currentTimeMillis()
+//            val version = Random(millis).nextInt(2000)
+//            val bytes = pageCmd("2900", "${version}${version}").toByteArray()
+//            SerialPortManager.sendBytes(
+//                mScreenPath,
+//                arrayOf(bytes)
+//            )
         }
         start_listen_kb.setOnClickListener {
             SerialPortManager.openSerialPort(
@@ -234,4 +241,161 @@ class MainActivity : AppCompatActivity() {
             return
         }
     }
+
+    /**
+     * 显示离线
+     */
+    var offlineCmd = byteArrayOf(
+        0x5A,
+        0xA5.toByte(),
+        0x45,
+        0x82.toByte(),
+        0x10,
+        0x00,
+        0x00,
+        0x04,
+        0x00,
+        0x07,
+        0x00,
+        0xE8.toByte(),
+        0x00,
+        0x12,
+        0x00,
+        0xEC.toByte(),
+        0x00,
+        0x15,
+        0xF8.toByte(),
+        0x00,
+        0x00,
+        0xEE.toByte(),
+        0x00,
+        0x0f,
+        0x00,
+        0xF2.toByte(),
+        0x00,
+        0x15,
+        0xF8.toByte(),
+        0x00,
+        0x00,
+        0xF4.toByte(),
+        0x00,
+        0x0c,
+        0x00,
+        0xF8.toByte(),
+        0x00,
+        0x15,
+        0xF8.toByte(),
+        0x00,
+        0x00,
+        0xFA.toByte(),
+        0x00,
+        0x09,
+        0x00,
+        0xFE.toByte(),
+        0x00,
+        0x15,
+        0xF8.toByte(),
+        0x00,
+        0x01,
+        0x00,
+        0x00,
+        0x06,
+        0x01,
+        0x04,
+        0x00,
+        0x15,
+        0xF8.toByte(),
+        0x00,
+        0x01,
+        0x06,
+        0x00,
+        0x03,
+        0x01,
+        0x0a,
+        0x00,
+        0x15,
+        0xF8.toByte(),
+        0x00,
+        0xFF.toByte(),
+        0x00
+    )
+
+    /**
+     * 显示满格信号
+     */
+    var onlineCmd = byteArrayOf(
+        0x5A,
+        0xA5.toByte(),
+        0x45,
+        0x82.toByte(),
+        0x10,
+        0x00,
+        0x00,
+        0x04,
+        0x00,
+        0x07,
+        0x00,
+        0xe8.toByte(),
+        0x00,
+        0x12,
+        0x00,
+        0xec.toByte(),
+        0x00,
+        0x15,
+        0xff.toByte(),
+        0xff.toByte(),
+        0x00,
+        0xee.toByte(),
+        0x00,
+        0x0f,
+        0x00,
+        0xf2.toByte(),
+        0x00,
+        0x15,
+        0xff.toByte(),
+        0xff.toByte(),
+        0x00,
+        0xf4.toByte(),
+        0x00,
+        0x0c,
+        0x00,
+        0xf8.toByte(),
+        0x00,
+        0x15,
+        0xff.toByte(),
+        0xff.toByte(),
+        0x00,
+        0xfa.toByte(),
+        0x00,
+        0x09,
+        0x00,
+        0xfe.toByte(),
+        0x00,
+        0x15,
+        0xff.toByte(),
+        0xff.toByte(),
+        0x01,
+        0x00,
+        0x00,
+        0x06,
+        0x01,
+        0x04,
+        0x00,
+        0x15,
+        0xff.toByte(),
+        0xff.toByte(),
+        0x01,
+        0x06,
+        0x00,
+        0x03,
+        0x01,
+        0x0a,
+        0x00,
+        0x15,
+        0xff.toByte(),
+        0xff.toByte(),
+        0xff.toByte(),
+        0x00
+    )
+
 }

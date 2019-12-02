@@ -20,6 +20,7 @@ public:
     void doWork(const std::vector<std::string>& msgs) override ;
 
     void readLoop();
+    virtual void doWork(const std::vector<char>& msg) override {};
 
 private:
     static constexpr auto read_interval = 200000;

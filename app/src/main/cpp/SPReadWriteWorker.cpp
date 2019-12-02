@@ -135,27 +135,29 @@ void SPReadWriteWorker::writeMessage(const std::vector<std::string> &messages) {
 void SPReadWriteWorker::writeLoop() {
     std::unique_lock<std::mutex> lk(m_mutex);
     while (true) {
-        cv.wait(lk, [&] { return stopRequested() || !mMessages.empty(); });
+        cv.wait(lk,
+                [&] { return stopRequested() || !mMessages.empty() || !mByteMessages.empty(); });
         if (stopRequested()) {
-//            LOGD("收到停止请求");
             break;
         }
-        auto commands = std::move(mMessages.front());
-        writeMessage(commands);
-        mMessages.pop();
+        if (!mMessages.empty()) {
+            auto commands = std::move(mMessages.front());
+            writeMessage(commands);
+            mMessages.pop();
+            continue;
+        }
+        if (!mByteMessages.empty()) {
+            auto commands = std::move(mByteMessages.front());
+            _serialPort->Write(&commands[0],commands.size());
+            mByteMessages.pop();
+        }
     }
-//    while (!stopRequested()) {
-//        m_mutex.lock();
-//        if (mMessages.empty()) {
-//            usleep(write_interval);
-//            m_mutex.unlock();
-//            continue;
-//        }
-//        auto commands = std::move(mMessages.front());
-//        writeMessage(commands);
-//        mMessages.pop();
-//        m_mutex.unlock();
-//    }
     LOGD("写线程终止运行");
+}
+
+void SPReadWriteWorker::doWork(const std::vector<char> &msg) {
+    const std::lock_guard<std::mutex> lock(m_mutex);
+    mByteMessages.push(msg);
+    cv.notify_all();
 }
 

@@ -27,6 +27,7 @@ public:
     int removeSerialPort(std::string path);
 
     int sendMessage(std::string path, const std::vector<std::string> &msg);
+    int sendBytesMessage(std::string path, const std::vector<char> &msg);
 
     static constexpr unsigned int FLAG_WRITE{0x1}; // hex for 0000 0001
     static constexpr unsigned int FLAG_READ{0x2}; // hex for 0000 0010
