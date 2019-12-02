@@ -109,6 +109,8 @@ SPReadWriteWorker::~SPReadWriteWorker() {
         write_thread->join();
     if (read_thread != nullptr && read_thread->joinable())
         read_thread->join();
+    std::queue<std::vector<char>>().swap(mByteMessages);
+    std::queue<std::vector<std::string>>().swap(mMessages);
     write_thread = nullptr;
     read_thread = nullptr;
     _serialPort->Close();
@@ -148,7 +150,7 @@ void SPReadWriteWorker::writeLoop() {
         }
         if (!mByteMessages.empty()) {
             auto commands = std::move(mByteMessages.front());
-            _serialPort->Write(&commands[0],commands.size());
+            _serialPort->Write(&commands[0], commands.size());
             mByteMessages.pop();
         }
     }
