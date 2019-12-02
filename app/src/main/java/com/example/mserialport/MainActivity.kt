@@ -145,11 +145,8 @@ class MainActivity : AppCompatActivity() {
             SerialPortManager.openSerialPort(mScreenPath, SERIAL_PORT_SCREEN_2)
             val millis = System.currentTimeMillis()
             val version = Random(millis).nextInt(2000)
-            val bytes = pageCmd("2900", "${version}${version}").toByteArray()
-            SerialPortManager.sendBytes(
-                mScreenPath,
-                arrayOf(bytes)
-            )
+            val bytes = pageCmd("2900", "${version}${version}")
+            SerialPortManager.sendMessage( mScreenPath, arrayOf(bytes) )
         }
         start_listen_kb.setOnClickListener {
             SerialPortManager.openSerialPort(
