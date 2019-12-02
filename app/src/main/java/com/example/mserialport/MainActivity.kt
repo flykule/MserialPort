@@ -61,6 +61,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     val dateCommand: String get() = nowDate(System.currentTimeMillis())
+    private var mTestTimer: Timer? = null;
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -91,7 +92,7 @@ class MainActivity : AppCompatActivity() {
         crazy_test.setOnClickListener {
             SerialPortManager.openSerialPort(mScreenPath, SERIAL_PORT_SCREEN_2)
 //            SerialPortManager.sendMessage(mScreenPath, arrayOf())
-            fixedRateTimer("Trump", true, 5 * 1000, 5) {
+            mTestTimer = fixedRateTimer("Trump", true, 5 * 1000, 5) {
                 val millis = System.currentTimeMillis()
                 val version = Random(millis).nextInt(2000)
                 val pageCmd = pageCmd("2900", "${version}${version}")
@@ -112,6 +113,7 @@ class MainActivity : AppCompatActivity() {
             SerialPortManager.closeSerialPort(SEARIAL_PORT_NAME_SCREEN_2)
         }
         close_all_sp.setOnClickListener {
+            mTestTimer?.cancel()
             SerialPortManager.closeSerialPort(mScreenPath)
             SerialPortManager.closeSerialPort(SERIAL_PORT_NAME_KEYBROAD)
             SerialPortManager.closeSerialPort(SERIAL_PORT_NAME_QRCODE_SCAN)
