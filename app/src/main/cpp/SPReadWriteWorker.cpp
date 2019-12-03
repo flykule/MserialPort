@@ -25,6 +25,8 @@ SPReadWriteWorker::SPReadWriteWorker(std::string &name, const int &baudrate, Jav
                                      jobject *callback) :
         jcallback(callback),
         read_thread(nullptr),
+        loop_thread(nullptr),
+        data_available(false),
         g_vm(vm),
         env(nullptr) {
     _serialPort = new SerialPort(name, baudrate);
@@ -42,6 +44,21 @@ SPReadWriteWorker::SPReadWriteWorker(std::string &name, const int &baudrate, Jav
 void SPReadWriteWorker::doWork(const std::vector<std::string> &msgs) {
     if (msgs[0] == START_READ) {
         read_thread = new std::thread(&SPReadWriteWorker::readLoop, this);
+        loop_thread = new std::thread([&] {
+            struct pollfd fds[1] = {};
+            fds[0].fd = _serialPort->getFileDescriptor();
+            fds[0].events = POLLIN | POLLPRI;
+            int ret = 0;
+            while (!stopRequested()) {
+                ret = poll(fds, 1, read_interval);
+                if (ret > 0 && (fds[0].revents & POLLIN)) {
+                    data_available.store(true);
+                    cv.notify_all();
+                }
+//                LOGD("Get revents %d", fds[0].revents);
+            }
+            LOGD("Loop Thread end");
+        });
     } else {
         const std::lock_guard<std::mutex> lock(m_mutex);
         mMessages.push(msgs);
@@ -73,26 +90,21 @@ void SPReadWriteWorker::readLoop() {
     }
 
     std::string data;
-    struct pollfd fds[1] = {};
-    fds[0].fd = _serialPort->getFileDescriptor();
-    fds[0].events = POLLIN | POLLPRI;
-    int ret = 0;
+    std::unique_lock<std::mutex> lk(m_mutex);
     //开始循环
     while (true) {
-        ret = poll(fds, 1, read_interval);
-        if (ret > 0) {
-            if (fds[0].revents & POLLIN) {
-                _serialPort->Read(data);
-                //执行回调
-                auto jArr = StringToJByteArray(env, data);
-                env->CallVoidMethod(*jcallback, javaCallbackId, jArr);
-                env->DeleteLocalRef(jArr);
-            }
-        } else {
-            if (stopRequested()) {
-                break;
-            }
+        cv.wait(lk, [&] {
+            return stopRequested() || data_available.load();
+        });
+        if (stopRequested()) {
+            break;
         }
+        _serialPort->Read(data);
+        //执行回调
+        data_available.store(false);
+        auto jArr = StringToJByteArray(env, data);
+        env->CallVoidMethod(*jcallback, javaCallbackId, jArr);
+        env->DeleteLocalRef(jArr);
     }
     LOGD("读线程终止运行");
     if (jcallback)
@@ -104,16 +116,17 @@ void SPReadWriteWorker::readLoop() {
 SPReadWriteWorker::~SPReadWriteWorker() {
     LOGD("开始销毁SPReadWriteWorker");
     stop();
-    usleep(read_interval + 5000);
+//    usleep(read_interval + 5000);
     if (write_thread != nullptr && write_thread->joinable())
         write_thread->join();
     if (read_thread != nullptr && read_thread->joinable())
         read_thread->join();
+    if (loop_thread != nullptr && loop_thread->joinable())
+        loop_thread->join();
     std::queue<std::vector<char>>().swap(mByteMessages);
     std::queue<std::vector<std::string>>().swap(mMessages);
     write_thread = nullptr;
     read_thread = nullptr;
-    tcsendbreak(_serialPort->getFileDescriptor(), read_interval);
     _serialPort->Close();
     _serialPort = nullptr;
     g_vm = nullptr;
