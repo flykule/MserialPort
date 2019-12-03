@@ -80,8 +80,8 @@ private:
     void writeMessage(const std::vector<std::string> &messages);
 
     //instance of promise/future pair that is used for messaging
-    static constexpr auto DEFAULT_TIME_INTERVAL = 50000;
-    int custom_read_interval;
+    static constexpr auto DEFAULT_TIME_INTERVAL = 500;
+    useconds_t custom_read_interval;
     std::mutex m_mutex;
     std::thread* loop_thread;
     std::atomic<bool> data_available;
