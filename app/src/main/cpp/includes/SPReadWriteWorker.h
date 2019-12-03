@@ -82,8 +82,6 @@ private:
     //instance of promise/future pair that is used for messaging
     static constexpr auto DEFAULT_TIME_INTERVAL = 50000;
     int custom_read_interval;
-    std::vector<char> mBuffer;
-    std::atomic<bool> data_complete;
     std::mutex m_mutex;
     std::thread* loop_thread;
     std::atomic<bool> data_available;
