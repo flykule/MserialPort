@@ -49,13 +49,21 @@ void SPReadWriteWorker::doWork(const std::vector<std::string> &msgs) {
             fds[0].fd = _serialPort->getFileDescriptor();
             fds[0].events = POLLIN | POLLPRI;
             int ret = 0;
+            int preCount = 0;
+            int readCount = 0;
             while (!stopRequested()) {
                 ret = poll(fds, 1, read_interval);
                 if (ret > 0 && (fds[0].revents & POLLIN)) {
-                    data_available.store(true);
-                    cv.notify_all();
+                    ioctl(_serialPort->getFileDescriptor(), FIONREAD, &readCount);
+                    if (preCount > 0 && (readCount == preCount)) {
+                        data_available.store(true);
+                        readCount = 0;
+                        preCount = 0;
+                        cv.notify_all();
+                    }
+                    preCount = readCount;
+                    usleep(read_interval);
                 }
-//                LOGD("Get revents %d", fds[0].revents);
             }
             LOGD("Loop Thread end");
         });
@@ -100,6 +108,7 @@ void SPReadWriteWorker::readLoop() {
             break;
         }
         _serialPort->Read(data);
+//        mBuffer.insert(mbu)
         data_available.store(false);
         //执行回调
         auto jArr = StringToJByteArray(env, data);

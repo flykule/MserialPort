@@ -79,7 +79,9 @@ private:
     void writeMessage(const std::vector<std::string> &messages);
 
     //instance of promise/future pair that is used for messaging
-    static constexpr auto read_interval = 500;
+    static constexpr auto read_interval = 50000;
+    std::vector<char> mBuffer;
+    std::atomic<bool> data_complete;
     std::mutex m_mutex;
     std::thread* loop_thread;
     std::atomic<bool> data_available;

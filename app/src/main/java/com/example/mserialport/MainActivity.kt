@@ -76,10 +76,10 @@ class MainActivity : AppCompatActivity() {
         read_qr_scanner.setOnClickListener {
             SerialPortManager.openSerialPort(
                 SERIAL_PORT_NAME_QRCODE_SCAN,
-                2400,
+                9600,
                 object : SerialPortManager.OnReadListener {
                     override fun onDataReceived(msg: ByteArray) {
-                        println("接受到扫码头消息${HexUtils.bytesToHexString(msg)}")
+                        println("接受到扫码头消息${String(msg)}")
                     }
                 })
         }
@@ -146,7 +146,7 @@ class MainActivity : AppCompatActivity() {
             val millis = System.currentTimeMillis()
             val version = Random(millis).nextInt(2000)
             val bytes = pageCmd("2900", "${version}${version}")
-            SerialPortManager.sendMessage( mScreenPath, arrayOf(bytes) )
+            SerialPortManager.sendMessage(mScreenPath, arrayOf(bytes))
         }
         start_listen_kb.setOnClickListener {
             SerialPortManager.openSerialPort(
