@@ -65,6 +65,7 @@ void SPReadWriteWorker::doWork(const std::vector<std::string> &msgs) {
                     preCount = readCount;
                     usleep(custom_read_interval);
                 }
+//                LOGD("reading loop.. stop: %d", stopRequested());
             }
             LOGD("Loop Thread end");
         });

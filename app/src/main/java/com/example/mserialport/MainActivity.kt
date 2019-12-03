@@ -122,7 +122,30 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private var mCardSeeker: Timer? = null;
+    private val seek_command = "02205272"
+    private val recognize_command = "09066003ffffffffffff65"
+
     private fun initListener() {
+        test_cardd.setOnClickListener {
+            SerialPortManager.openSerialPort(
+                "/dev/ttysWK1",
+                57600,
+                object : SerialPortManager.OnReadListener {
+                    override fun onDataReceived(msg: ByteArray) {
+                        println("Received msg ${HexUtils.bytesToHexString(msg)}")
+                        mCardSeeker?.cancel()
+                        this@MainActivity.window.decorView.postDelayed({
+                            SerialPortManager.sendMessage("/dev/ttysWK1", arrayOf(recognize_command))
+                            SerialPortManager.closeSerialPort("/dev/ttysWK1")
+                        }, 400)
+                    }
+                })
+            mCardSeeker = fixedRateTimer("CardTimer", true, 0, 100) {
+                println("Send seek command")
+                SerialPortManager.sendMessage("/dev/ttysWK1", arrayOf(seek_command))
+            }
+        }
         update_time.setOnClickListener {
             SerialPortManager.openSerialPort(mScreenPath, SERIAL_PORT_SCREEN_2)
             SerialPortManager.sendMessage(
