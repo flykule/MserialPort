@@ -133,8 +133,8 @@ namespace mn {
 
             //===================== (.c_oflag) =================//
 
-//            tty.c_oflag = 0;              // No remapping, no delays
-//            tty.c_oflag &= ~OPOST;            // Make raw
+            tty.c_oflag = 0;              // No remapping, no delays
+            tty.c_oflag &= ~OPOST;            // Make raw
 
             //================= CONTROL CHARACTERS (.c_cc[]) ==================//
 
@@ -165,8 +165,8 @@ namespace mn {
 
             //======================== (.c_iflag) ====================//
 
-//            tty.c_iflag &= ~(IXON | IXOFF | IXANY);            // Turn off s/w flow ctrl
-//            tty.c_iflag &= ~(IGNBRK | BRKINT | PARMRK | ISTRIP | INLCR | IGNCR | ICRNL);
+            tty.c_iflag &= ~(IXON | IXOFF | IXANY);            // Turn off s/w flow ctrl
+            tty.c_iflag &= ~(IGNBRK | BRKINT | PARMRK | ISTRIP | INLCR | IGNCR | ICRNL);
 
 
 

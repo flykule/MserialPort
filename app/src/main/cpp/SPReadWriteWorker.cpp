@@ -75,7 +75,7 @@ void SPReadWriteWorker::readLoop() {
     std::string data;
     struct pollfd fds[1] = {};
     fds[0].fd = _serialPort->getFileDescriptor();
-    fds[0].events = POLLIN;
+    fds[0].events = POLLIN | POLLPRI;
     int ret = 0;
     //开始循环
     while (true) {
@@ -113,6 +113,7 @@ SPReadWriteWorker::~SPReadWriteWorker() {
     std::queue<std::vector<std::string>>().swap(mMessages);
     write_thread = nullptr;
     read_thread = nullptr;
+    tcsendbreak(_serialPort->getFileDescriptor(), read_interval);
     _serialPort->Close();
     _serialPort = nullptr;
     g_vm = nullptr;
@@ -145,12 +146,14 @@ void SPReadWriteWorker::writeLoop() {
         if (!mMessages.empty()) {
             auto commands = std::move(mMessages.front());
             writeMessage(commands);
+            commands.clear();
             mMessages.pop();
             continue;
         }
         if (!mByteMessages.empty()) {
             auto commands = std::move(mByteMessages.front());
             _serialPort->Write(&commands[0], commands.size());
+            commands.clear();
             mByteMessages.pop();
         }
     }
