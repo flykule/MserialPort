@@ -55,9 +55,7 @@ void SPReadWriteWorker::doWork(const std::vector<std::string> &msgs) {
             while (!stopRequested()) {
                 ret = poll(fds, 1, custom_read_interval);
                 if (ret > 0 && (fds[0].revents & POLLIN)) {
-                    LOGD("Start ioctl");
                     ioctl(_serialPort->getFileDescriptor(), FIONREAD, &readCount);
-                    LOGD("Ioctl ret: %d", ret);
                     if (preCount > 0 && (readCount == preCount)) {
                         data_available.store(true);
                         readCount = 0;
@@ -65,9 +63,8 @@ void SPReadWriteWorker::doWork(const std::vector<std::string> &msgs) {
                         cv.notify_all();
                     }
                     preCount = readCount;
+                    usleep(custom_read_interval);
                 }
-                LOGD("Stop requested: %s", std::to_string(stopRequested()).c_str());
-                usleep(custom_read_interval);
             }
             LOGD("Loop Thread end");
         });
