@@ -86,10 +86,24 @@ jint JNI_OnLoad(JavaVM *jvm, void *reserved) {
     return JNI_VERSION_1_4;
 }
 
-static jbyteArray StringToJByteArray(JNIEnv *env, const std::string &nativeString) {
-    jbyteArray arr = env->NewByteArray(nativeString.length());
-    env->SetByteArrayRegion(arr, 0, nativeString.length(), (jbyte *) nativeString.c_str());
-    return arr;
+//static jbyteArray StringToJByteArray(JNIEnv *env, const std::string &nativeString) {
+//    jbyteArray arr = env->NewByteArray(nativeString.length());
+//    env->SetByteArrayRegion(arr, 0, nativeString.length(), (jbyte *) nativeString.c_str());
+//    return arr;
+//}
+
+extern "C" JNIEXPORT void JNICALL
+Java_com_castle_serialport_SerialPortManager_setReadTimeInterval(
+        JNIEnv *env,
+        jobject thiz,
+        jstring path,
+        jint readInterval
+) {
+    const char *path_utf = env->GetStringUTFChars(path, nullptr);
+    auto name = std::string(path_utf);
+    std::string command = SET_READ_INTERVAL + std::to_string(readInterval);
+    mManager->sendMessage(name, {command});
+    env->ReleaseStringUTFChars(path, path_utf);
 }
 
 extern "C" JNIEXPORT void JNICALL

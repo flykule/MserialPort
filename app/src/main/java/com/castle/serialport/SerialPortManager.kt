@@ -41,6 +41,12 @@ object SerialPortManager {
     external fun sendBytes(path: String, msg: Array<ByteArray>, flags: Int = FLAG_WRITE)
 
     /**
+     * @param timeInterval 轮循读串口的时间,单位为纳秒 参考时间(键盘-5000, 短码扫码头-50000, 长码扫玛头-500000)
+     * @param path 串口路径,通常为/dev/tty*开头
+     */
+    external fun setReadTimeInterval(path: String, timeInterval: Int)
+
+    /**
      * 打开一个读串口,用于监听数据
      * @param path 串口路径,通常为/dev/tty*开头
      * @param baudrate 串口拨特率,底层在打开串口时会检测一次默认波特率

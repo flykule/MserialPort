@@ -13,6 +13,7 @@
 
 using namespace mn::CppLinuxSerial;
 static constexpr auto START_READ = "start_read";
+static constexpr auto SET_READ_INTERVAL = "read_interval:";
 
 class SPReadWriteWorker : public IWorker {
 
@@ -79,7 +80,8 @@ private:
     void writeMessage(const std::vector<std::string> &messages);
 
     //instance of promise/future pair that is used for messaging
-    static constexpr auto read_interval = 50000;
+    static constexpr auto DEFAULT_TIME_INTERVAL = 50000;
+    int custom_read_interval;
     std::vector<char> mBuffer;
     std::atomic<bool> data_complete;
     std::mutex m_mutex;

@@ -24,6 +24,7 @@ static void HexToBytes(const std::string &hex, char *result) {
 SPReadWriteWorker::SPReadWriteWorker(std::string &name, const int &baudrate, JavaVM *vm,
                                      jobject *callback) :
         jcallback(callback),
+        custom_read_interval(DEFAULT_TIME_INTERVAL),
         read_thread(nullptr),
         loop_thread(nullptr),
         data_available(false),
@@ -52,7 +53,7 @@ void SPReadWriteWorker::doWork(const std::vector<std::string> &msgs) {
             int preCount = 0;
             int readCount = 0;
             while (!stopRequested()) {
-                ret = poll(fds, 1, read_interval);
+                ret = poll(fds, 1, custom_read_interval);
                 if (ret > 0 && (fds[0].revents & POLLIN)) {
                     ioctl(_serialPort->getFileDescriptor(), FIONREAD, &readCount);
                     if (preCount > 0 && (readCount == preCount)) {
@@ -62,11 +63,14 @@ void SPReadWriteWorker::doWork(const std::vector<std::string> &msgs) {
                         cv.notify_all();
                     }
                     preCount = readCount;
-                    usleep(read_interval);
+                    usleep(custom_read_interval);
                 }
             }
             LOGD("Loop Thread end");
         });
+    } else if (msgs[0].find(SET_READ_INTERVAL) != std::string::npos) {
+        custom_read_interval = std::stoi(msgs[0].substr(14));
+        LOGD("Set time interval : %d", custom_read_interval);
     } else {
         const std::lock_guard<std::mutex> lock(m_mutex);
         mMessages.push(msgs);
