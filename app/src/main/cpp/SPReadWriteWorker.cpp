@@ -100,8 +100,8 @@ void SPReadWriteWorker::readLoop() {
             break;
         }
         _serialPort->Read(data);
-        //执行回调
         data_available.store(false);
+        //执行回调
         auto jArr = StringToJByteArray(env, data);
         env->CallVoidMethod(*jcallback, javaCallbackId, jArr);
         env->DeleteLocalRef(jArr);
