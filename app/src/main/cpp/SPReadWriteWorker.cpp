@@ -55,7 +55,9 @@ void SPReadWriteWorker::doWork(const std::vector<std::string> &msgs) {
             while (!stopRequested()) {
                 ret = poll(fds, 1, custom_read_interval);
                 if (ret > 0 && (fds[0].revents & POLLIN)) {
+                    LOGD("Start ioctl");
                     ioctl(_serialPort->getFileDescriptor(), FIONREAD, &readCount);
+                    LOGD("Ioctl ret: %d", ret);
                     if (preCount > 0 && (readCount == preCount)) {
                         data_available.store(true);
                         readCount = 0;
@@ -63,13 +65,14 @@ void SPReadWriteWorker::doWork(const std::vector<std::string> &msgs) {
                         cv.notify_all();
                     }
                     preCount = readCount;
-                    usleep(custom_read_interval);
                 }
+                LOGD("Stop requested: %s", std::to_string(stopRequested()).c_str());
+                usleep(custom_read_interval);
             }
             LOGD("Loop Thread end");
         });
     } else if (msgs[0].find(SET_READ_INTERVAL) != std::string::npos) {
-        custom_read_interval = std::stoi(msgs[0].substr(14));
+        custom_read_interval = static_cast<useconds_t>(std::stoi(msgs[0].substr(14)));
         LOGD("Set time interval : %d", custom_read_interval);
     } else {
         const std::lock_guard<std::mutex> lock(m_mutex);
@@ -129,7 +132,7 @@ void SPReadWriteWorker::readLoop() {
 SPReadWriteWorker::~SPReadWriteWorker() {
     LOGD("开始销毁SPReadWriteWorker");
     stop();
-//    usleep(read_interval + 5000);
+    usleep(custom_read_interval + 5000);
     if (write_thread != nullptr && write_thread->joinable())
         write_thread->join();
     if (read_thread != nullptr && read_thread->joinable())

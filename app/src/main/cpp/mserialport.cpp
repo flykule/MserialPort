@@ -102,7 +102,7 @@ Java_com_castle_serialport_SerialPortManager_setReadTimeInterval(
     const char *path_utf = env->GetStringUTFChars(path, nullptr);
     auto name = std::string(path_utf);
     std::string command = SET_READ_INTERVAL + std::to_string(readInterval);
-    mManager->sendMessage(name, {command});
+    mManager->sendMessage(name, {std::move(command)});
     env->ReleaseStringUTFChars(path, path_utf);
 }
 
