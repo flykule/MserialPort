@@ -82,7 +82,7 @@ class MainActivity : AppCompatActivity() {
                         println("接受到扫码头消息${String(msg)}")
                     }
                 })
-            SerialPortManager.setReadTimeInterval(SERIAL_PORT_NAME_QRCODE_SCAN, 5000)
+            SerialPortManager.setReadTimeInterval(SERIAL_PORT_NAME_QRCODE_SCAN, 500000)
         }
         start_listen_screen_2.setOnClickListener {
             SerialPortManager.openSerialPort(
@@ -159,6 +159,7 @@ class MainActivity : AppCompatActivity() {
                     }
                 });
             SerialPortManager.sendMessage(SERIAL_PORT_NAME_KEYBROAD, arrayOf("0000"))
+            SerialPortManager.setReadTimeInterval(SERIAL_PORT_NAME_KEYBROAD, 200)
         }
         end_listen_kb.setOnClickListener {
             SerialPortManager.closeSerialPort(SERIAL_PORT_NAME_KEYBROAD);
