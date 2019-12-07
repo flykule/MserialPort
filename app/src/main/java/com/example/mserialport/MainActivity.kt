@@ -82,7 +82,7 @@ class MainActivity : AppCompatActivity() {
                         println("接受到扫码头消息${String(msg)}")
                     }
                 })
-            SerialPortManager.setReadTimeInterval(SERIAL_PORT_NAME_QRCODE_SCAN, 50000)
+            SerialPortManager.setReadTimeInterval(SERIAL_PORT_NAME_QRCODE_SCAN, 500)
         }
         start_listen_screen_2.setOnClickListener {
             SerialPortManager.openSerialPort(
@@ -129,25 +129,32 @@ class MainActivity : AppCompatActivity() {
     private fun initListener() {
         test_cardd.setOnClickListener {
             SerialPortManager.openSerialPort(
-                "/dev/ttysWK1",
-                57600,
+                SERIAL_PORT_NAME_KEYBROAD,
+                SERIAL_PORT_KEYBROAD,
                 object : SerialPortManager.OnReadListener {
                     override fun onDataReceived(msg: ByteArray) {
-                        println("Received msg ${HexUtils.bytesToHexString(msg)}")
-                        mCardSeeker?.cancel()
-                        this@MainActivity.window.decorView.postDelayed({
-                            SerialPortManager.sendMessage("/dev/ttysWK1", arrayOf(recognize_command))
-                            SerialPortManager.closeSerialPort("/dev/ttysWK1")
-                        }, 400)
+                        println("Received keyboard msg ${HexUtils.bytesToHexString(msg)}")
                     }
                 })
-            mCardSeeker = fixedRateTimer("CardTimer", true, 0, 100) {
-                println("Send seek command")
-                SerialPortManager.sendMessage("/dev/ttysWK1", arrayOf(seek_command))
+            SerialPortManager.setReadTimeInterval(SERIAL_PORT_NAME_KEYBROAD,1)
+            mCardSeeker?.cancel()
+            mCardSeeker = fixedRateTimer("CardTimer", true, 0, 1) {
+                SerialPortManager.sendMessage(SERIAL_PORT_NAME_KEYBROAD, arrayOf("0000"))
+//                println("Send seek command")
+//                SerialPortManager.sendMessage("/dev/ttysWK1", arrayOf(seek_command))
             }
         }
         update_time.setOnClickListener {
-            SerialPortManager.openSerialPort(mScreenPath, SERIAL_PORT_SCREEN_2)
+            SerialPortManager.openSerialPort(
+                mScreenPath,
+                SERIAL_PORT_SCREEN_2,
+                object : SerialPortManager.OnReadListener {
+                    override fun onDataReceived(msg: ByteArray) {
+                        println("收到屏幕消息${HexUtils.bytesToHexString(msg)}")
+                    }
+
+                })
+            SerialPortManager.setReadTimeInterval(mScreenPath, 1000)
             SerialPortManager.sendMessage(
                 mScreenPath,
                 arrayOf(pageJump(PageJump("04")), dateCommand),
@@ -180,9 +187,9 @@ class MainActivity : AppCompatActivity() {
                     override fun onDataReceived(msg: ByteArray) {
                         println("接受到键盘消息${HexUtils.bytesToHexString(msg)}")
                     }
-                });
+                })
             SerialPortManager.sendMessage(SERIAL_PORT_NAME_KEYBROAD, arrayOf("0000"))
-            SerialPortManager.setReadTimeInterval(SERIAL_PORT_NAME_KEYBROAD, 200)
+            SerialPortManager.setReadTimeInterval(SERIAL_PORT_NAME_KEYBROAD, 10)
         }
         end_listen_kb.setOnClickListener {
             SerialPortManager.closeSerialPort(SERIAL_PORT_NAME_KEYBROAD);

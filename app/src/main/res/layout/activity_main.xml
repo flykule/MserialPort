@@ -147,7 +147,7 @@
         android:textColor="#fff"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="测试寻卡"
+        android:text="测试键盘"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toLeftOf="@id/start_listen_kb"
         app:layout_constraintTop_toTopOf="@id/start_listen_kb" />
