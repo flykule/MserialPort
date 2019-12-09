@@ -9,62 +9,63 @@
 
     <Button
         android:id="@+id/update_time"
-        android:background="@color/colorPrimary"
-        android:foreground="?android:selectableItemBackground"
-        android:textColor="#fff"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="更新时间"
         android:layout_marginTop="60dp"
+        android:background="@color/colorPrimary"
+        android:foreground="?android:selectableItemBackground"
+        android:text="更新时间"
+        android:textColor="#fff"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/crazy_test"
-        android:background="@color/colorPrimary"
-        android:foreground="?android:selectableItemBackground"
-        android:textColor="#fff"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="疯狂刷新"
         android:layout_marginTop="60dp"
+        android:background="@color/colorPrimary"
+        android:foreground="?android:selectableItemBackground"
+        android:text="疯狂刷新"
+        android:textColor="#fff"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toLeftOf="@id/update_time"
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/read_qr_scanner"
-        android:background="@color/colorPrimary"
-        android:foreground="?android:selectableItemBackground"
-        android:textColor="#fff"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
+        android:foreground="?android:selectableItemBackground"
         android:text="开始读取扫码头"
+        android:textColor="#fff"
         app:layout_constraintLeft_toRightOf="@id/update_time"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="@id/update_time" />
+
     <Button
         android:id="@+id/update_version"
-        android:background="@color/colorPrimary"
-        android:foreground="?android:selectableItemBackground"
-        android:textColor="#fff"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="乱数版本"
         android:layout_marginTop="20dp"
+        android:background="@color/colorPrimary"
+        android:foreground="?android:selectableItemBackground"
+        android:text="乱数版本"
+        android:textColor="#fff"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@id/update_time" />
 
     <Button
         android:id="@+id/stop_read_qr_scanner"
-        android:background="@color/colorPrimary"
-        android:foreground="?android:selectableItemBackground"
-        android:textColor="#fff"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
+        android:foreground="?android:selectableItemBackground"
         android:text="停止读取扫码头"
+        android:textColor="#fff"
         app:layout_constraintLeft_toRightOf="@id/update_version"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="@id/update_version" />
@@ -72,83 +73,102 @@
 
     <Button
         android:id="@+id/start_listen_kb"
-        android:background="@color/colorPrimary"
-        android:foreground="?android:selectableItemBackground"
-        android:textColor="#fff"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="开始监听键盘"
         android:layout_marginTop="20dp"
+        android:background="@color/colorPrimary"
+        android:foreground="?android:selectableItemBackground"
+        android:text="开始监听键盘"
+        android:textColor="#fff"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@id/update_version" />
 
     <Button
         android:id="@+id/start_listen_screen_2"
-        android:background="@color/colorPrimary"
-        android:foreground="?android:selectableItemBackground"
-        android:textColor="#fff"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
+        android:foreground="?android:selectableItemBackground"
         android:text="开启副屏"
+        android:textColor="#fff"
         app:layout_constraintLeft_toRightOf="@id/update_version"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="@id/update_version" />
+
     <Button
         android:id="@+id/end_listen_kb"
-        android:background="@color/colorPrimary"
-        android:foreground="?android:selectableItemBackground"
-        android:textColor="#fff"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="停止监听键盘"
         android:layout_marginTop="20dp"
+        android:background="@color/colorPrimary"
+        android:foreground="?android:selectableItemBackground"
+        android:text="停止监听键盘"
+        android:textColor="#fff"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@id/start_listen_kb" />
+
     <Button
         android:id="@+id/end_listen_screen_2"
-        android:background="@color/colorPrimary"
-        android:foreground="?android:selectableItemBackground"
-        android:textColor="#fff"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
+        android:foreground="?android:selectableItemBackground"
         android:text="关闭副屏"
+        android:textColor="#fff"
         app:layout_constraintLeft_toRightOf="@id/start_listen_kb"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="@id/start_listen_kb" />
+
     <Button
         android:id="@+id/close_all_sp"
-        android:background="@color/colorPrimary"
-        android:foreground="?android:selectableItemBackground"
-        android:textColor="#fff"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
+        android:foreground="?android:selectableItemBackground"
         android:text="关闭所有串口"
+        android:textColor="#fff"
         app:layout_constraintLeft_toRightOf="@id/end_listen_kb"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="@id/end_listen_kb" />
 
     <Button
         android:id="@+id/test_bytes"
-        android:background="@color/colorPrimary"
-        android:foreground="?android:selectableItemBackground"
-        android:textColor="#fff"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
+        android:foreground="?android:selectableItemBackground"
         android:text="测试字节命令"
+        android:textColor="#fff"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toLeftOf="@id/update_version"
         app:layout_constraintTop_toTopOf="@id/update_version" />
+
     <Button
-        android:id="@+id/test_cardd"
-        android:background="@color/colorPrimary"
-        android:foreground="?android:selectableItemBackground"
-        android:textColor="#fff"
+        android:id="@+id/test_keyboard"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
+        android:foreground="?android:selectableItemBackground"
         android:text="测试键盘"
+        android:textColor="#fff"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toLeftOf="@id/start_listen_kb"
         app:layout_constraintTop_toTopOf="@id/start_listen_kb" />
+
+    <TextView
+        android:id="@+id/tv_status"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@android:color/holo_red_dark"
+        android:gravity="center"
+        android:padding="10dp"
+        android:text="TextView"
+        android:textColor="@android:color/white"
+        android:textSize="28sp"
+        android:layout_marginTop="25dp"
+        app:layout_constraintTop_toBottomOf="@id/close_all_sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

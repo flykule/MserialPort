@@ -10,6 +10,7 @@ import com.castle.serialport.SerialPortManager
 import kotlinx.android.synthetic.main.activity_main.*
 import java.util.*
 import kotlin.concurrent.fixedRateTimer
+import kotlin.concurrent.timer
 
 
 class MainActivity : AppCompatActivity() {
@@ -82,7 +83,7 @@ class MainActivity : AppCompatActivity() {
                         println("接受到扫码头消息${String(msg)}")
                     }
                 })
-            SerialPortManager.setReadTimeInterval(SERIAL_PORT_NAME_QRCODE_SCAN, 500)
+            SerialPortManager.setReadTimeInterval(SERIAL_PORT_NAME_QRCODE_SCAN, 50000)
         }
         start_listen_screen_2.setOnClickListener {
             SerialPortManager.openSerialPort(
@@ -125,23 +126,37 @@ class MainActivity : AppCompatActivity() {
     private var mCardSeeker: Timer? = null;
     private val seek_command = "02205272"
     private val recognize_command = "09066003ffffffffffff65"
+    private var mKeyboardDetectTimer: Timer? = null
+    private var mDeadCount = 0
+    private var mNormalCount = 0
+
 
     private fun initListener() {
-        test_cardd.setOnClickListener {
+        test_keyboard.setOnClickListener {
             SerialPortManager.openSerialPort(
                 SERIAL_PORT_NAME_KEYBROAD,
                 SERIAL_PORT_KEYBROAD,
                 object : SerialPortManager.OnReadListener {
                     override fun onDataReceived(msg: ByteArray) {
-                        println("Received keyboard msg ${HexUtils.bytesToHexString(msg)}")
+                        mNormalCount++
+                        runOnUiThread {
+                            tv_status.text = ("监听键盘中: 死亡/正常返回 ${mDeadCount}/${mNormalCount}")
+                        }
+                        mKeyboardDetectTimer?.cancel()
                     }
                 })
-            SerialPortManager.setReadTimeInterval(SERIAL_PORT_NAME_KEYBROAD,1)
+            SerialPortManager.setReadTimeInterval(SERIAL_PORT_NAME_KEYBROAD, 1)
             mCardSeeker?.cancel()
-            mCardSeeker = fixedRateTimer("CardTimer", true, 0, 1) {
+            mCardSeeker = fixedRateTimer("CardTimer", true, 0, 1500) {
                 SerialPortManager.sendMessage(SERIAL_PORT_NAME_KEYBROAD, arrayOf("0000"))
-//                println("Send seek command")
-//                SerialPortManager.sendMessage("/dev/ttysWK1", arrayOf(seek_command))
+                mKeyboardDetectTimer = timer("KeyboardResponseTimer", true, 1000, 3000) {
+                    mDeadCount++
+                    runOnUiThread {
+                        tv_status.text = ("监听键盘中: 死亡/正常返回 ${mDeadCount}/${mNormalCount}")
+                        test_keyboard.performClick()
+                    }
+                    SerialPortManager.closeSerialPort(SERIAL_PORT_NAME_KEYBROAD)
+                }
             }
         }
         update_time.setOnClickListener {
